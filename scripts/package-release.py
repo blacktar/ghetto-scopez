@@ -13,7 +13,12 @@ for name,expected in required.items():
  package=root/'web/node_modules'/name
  actual=json.loads((package/'package.json').read_text())['version']
  if actual!=expected:raise SystemExit(f'{name}: expected {expected}, found {actual}')
- extra += [str(p.relative_to(root)) for p in package.rglob('*') if p.is_file()]
+ # Ship runtime files and their licences, excluding examples and source tooling.
+ paths=[package/'package.json',package/'LICENSE']
+ if name=='ws':paths += [package/'index.js',package/'wrapper.mjs',*(package/'lib').glob('*.js')]
+ elif name=='nosleep.js':paths += [package/'dist/NoSleep.min.js']
+ elif name=='three':paths += list((package/'build').glob('*.js'))
+ extra += [str(p.relative_to(root)) for p in paths if p.is_file()]
 files=sorted(set(filter(None,tracked+extra)))
 with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for rel in files:z.write(root/rel,'Ghetto-Scopez/'+rel)
