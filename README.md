@@ -42,7 +42,7 @@ Waveform, RGB parade/histogram, vectorscopes and highs/mids/lows views, DoubleD,
 a rotatable RGB cube, saturation/luma and hue histogram; image region and colour
 selection; three A/B/C snapshots per scope; saved browser settings and settings
 files. The guide works offline and on portrait phones. Its full-width header
-randomly selects one of 34 supplied images, converted to responsive WebP assets.
+randomly selects one of 37 supplied images, converted to responsive WebP assets.
 
 Source / working-space tap: choose **Source / working-space RGB — no transform**
 in GTap Input to measure raw float32 RGB at that node. RGB is unchanged; negative
