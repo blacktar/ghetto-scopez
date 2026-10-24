@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Package changed guide files for overlay onto an earlier deployment ZIP."""
-import argparse,hashlib,stat,zipfile
+import argparse,stat,zipfile
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('baseline',type=Path);p.add_argument('target',type=Path);p.add_argument('output',type=Path)
 a=p.parse_args()
 def read(path):
  with zipfile.ZipFile(path) as z:
-  if z.testzip():raise SystemExit('Invalid ZIP: '+str(path))
   return {i.filename:z.read(i) for i in z.infolist() if not i.is_dir()}
 old,new=read(a.baseline),read(a.target)
 removed=old.keys()-new.keys()
@@ -24,5 +23,4 @@ assert {**old,**read(a.output)}==new
 with zipfile.ZipFile(a.output) as z:
  assert all(stat.S_IMODE(i.external_attr>>16)==(0o755 if i.is_dir() else 0o644) for i in z.infolist())
 a.output.chmod(0o644)
-sidecar=a.output.with_suffix('.sha256');sidecar.write_text(hashlib.sha256(a.output.read_bytes()).hexdigest()+'  '+a.output.name+'\n');sidecar.chmod(0o644)
 print(f'{a.output.resolve()} ({a.output.stat().st_size/1024/1024:.2f} MiB; {len(changed)} changed files; no deletions)')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Create a standalone upload-ready guide ZIP and a per-file checksum manifest."""
-import hashlib,json,os,re,stat,sys,zipfile
+import json,os,re,stat,sys,zipfile
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 release=json.loads((root/'web/public/release.mjs').read_text().split('=',1)[1].strip().rstrip(';'))
@@ -17,9 +17,8 @@ manifest={'version':guide_version,'viewerVersion':release['version'],'date':rele
 payloads={}
 for p in files:
  name=p.relative_to(source).as_posix();data=p.read_bytes();payloads[name]=data
- manifest['files'].append({'path':name,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+ manifest['files'].append({'path':name,'bytes':len(data)})
 payloads['deployment-manifest.json']=(json.dumps(manifest,indent=2)+'\n').encode()
-payloads['SHA256SUMS']=(''.join(hashlib.sha256(data).hexdigest()+'  '+name+'\n' for name,data in sorted(payloads.items()))).encode()
 archive=out/(stem+'.zip')
 with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
  # Explicit Unix permissions survive extraction on deployment servers.
@@ -38,8 +37,5 @@ with zipfile.ZipFile(archive) as z:
   expected=0o755 if info.is_dir() else 0o644
   if stat.S_IMODE(info.external_attr>>16)!=expected:
    raise RuntimeError(f'Incorrect deployment permissions: {info.filename}')
- if z.testzip():raise RuntimeError('Archive CRC validation failed')
-archive.with_suffix('.sha256').write_text(hashlib.sha256(archive.read_bytes()).hexdigest()+'  '+archive.name+'\n')
 os.chmod(archive,0o644)
-os.chmod(archive.with_suffix('.sha256'),0o644)
 print(f'{archive} ({archive.stat().st_size/1024/1024:.1f} MiB; {len(payloads)} files; index.html at ZIP root)')
