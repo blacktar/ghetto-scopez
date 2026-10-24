@@ -1,9 +1,8 @@
 # Ghetto Scopez + GTap
 
 Colour scopes from DaVinci Resolve in a browser on your local network.
-Made by **Vidar Andersen**. [Project website](https://vidarandersen.com/dmz/ghettoscopez).
+Made by **Vidar Andersen**. [Read the user guide](https://vidarandersen.com/dmz/ghettoscopez).
 
-**[Read the user guide](web/public/guide/index.html)** ·
 [Download the Mac release](https://github.com/blacktar/ghetto-scopez/releases/latest)
 
 ## Install and start
