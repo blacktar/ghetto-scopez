@@ -14,4 +14,20 @@ version_file.write_text(version+'\n')
 release={'version':version,'date':stamp}
 (root/'web/public/release.mjs').write_text('export const RELEASE='+json.dumps(release)+';\n')
 p=root/'web/public/scopes.html';text=p.read_text();text=re.sub(r'Ghetto Scopez \(v[^,)]+,\s*\d{8}\)',f'Ghetto Scopez (v{version}, {stamp})',text);p.write_text(text)
+# Keep the deployable guide's visible and structured release information in sync.
+guide=root/'web/public/guide/index.html'
+if guide.exists():
+ text=guide.read_text()
+ text=re.sub(r'Viewer \d+\.\d+\.\d+( · GTap [^<]+? · )\d{8}',lambda m:f'Viewer {version}'+m[1]+stamp,text)
+ pattern=r'(<script type="application/ld\+json">\s*)(.*?)(\s*</script>)'
+ match=re.search(pattern,text,re.S)
+ if match:
+  metadata=json.loads(match[2])
+  for item in metadata.get('@graph',[]):
+   if item.get('@id','').endswith('#software'):
+    item['softwareVersion']=version
+    item['downloadUrl']=f'https://github.com/blacktar/ghetto-scopez/releases/download/v{version}/Ghetto-Scopez-{version}-mac.zip'
+   if 'dateModified' in item:item['dateModified']=f'{stamp[:4]}-{stamp[4:6]}-{stamp[6:]}'
+  text=text[:match.start(2)]+json.dumps(metadata,ensure_ascii=False,indent=2)+text[match.end(2):]
+ guide.write_text(text)
 print(f'Ghetto Scopez v{version} ({stamp})')

@@ -7,7 +7,7 @@ Made by **Vidar Andersen**. [Read the user guide](https://vidarandersen.com/dmz/
 
 ## Install and start
 
-This release includes **GTap 1.2.23** and **viewer 0.2.50**.
+This release includes **GTap 1.2.23** and **viewer 0.2.51**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
 DaVinci Resolve is required. The installer automatically installs the official

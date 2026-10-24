@@ -1,5 +1,84 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><meta name="description" content="Install and use Ghetto Scopez and GTap: colour scopes for DaVinci Resolve in your browser."><title>Ghetto Scopez — User guide</title>
+<link rel="canonical" href="https://vidarandersen.com/dmz/ghettoscopez/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://vidarandersen.com/#vidar-andersen",
+      "name": "Vidar Andersen",
+      "url": "https://vidarandersen.com/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://vidarandersen.com/dmz/ghettoscopez/#software",
+      "name": "Ghetto Scopez",
+      "url": "https://vidarandersen.com/dmz/ghettoscopez/",
+      "description": "Show scopes (both familiar & new) for DaVinci Resolve using a tablet, phone, laptop or any display with a browser connected to your network.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "macOS 27 or later (host)",
+      "softwareRequirements": "DaVinci Resolve on the host Mac; a web browser on the receiving device; a shared local network. Node.js is installed automatically when needed.",
+      "softwareVersion": "0.2.51",
+      "author": {
+        "@id": "https://vidarandersen.com/#vidar-andersen"
+      },
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "sameAs": "https://github.com/blacktar/ghetto-scopez",
+      "downloadUrl": "https://github.com/blacktar/ghetto-scopez/releases/download/v0.2.51/Ghetto-Scopez-0.2.51-mac.zip",
+      "screenshot": "https://vidarandersen.com/dmz/ghettoscopez/assets/fullscreen-scopes.png",
+      "softwareHelp": {
+        "@id": "https://vidarandersen.com/dmz/ghettoscopez/#guide"
+      },
+      "softwareAddOn": {
+        "@type": "SoftwareApplication",
+        "name": "GTap",
+        "softwareVersion": "1.2.23",
+        "operatingSystem": "macOS 27 or later",
+        "applicationCategory": "MultimediaApplication",
+        "author": {
+          "@id": "https://vidarandersen.com/#vidar-andersen"
+        },
+        "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://vidarandersen.com/dmz/ghettoscopez/#guide",
+      "url": "https://vidarandersen.com/dmz/ghettoscopez/",
+      "headline": "Ghetto Scopez — User guide",
+      "description": "Show scopes (both familiar & new) for DaVinci Resolve using a tablet, phone, laptop or any display with a browser connected to your network.",
+      "inLanguage": "en",
+      "dateModified": "2026-10-24",
+      "author": {
+        "@id": "https://vidarandersen.com/#vidar-andersen"
+      },
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "isAccessibleForFree": true,
+      "about": {
+        "@id": "https://vidarandersen.com/dmz/ghettoscopez/#software"
+      },
+      "mainEntityOfPage": {
+        "@id": "https://vidarandersen.com/dmz/ghettoscopez/#webpage"
+      },
+      "image": "https://vidarandersen.com/dmz/ghettoscopez/assets/fullscreen-scopes.png"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://vidarandersen.com/dmz/ghettoscopez/#webpage",
+      "url": "https://vidarandersen.com/dmz/ghettoscopez/",
+      "name": "Ghetto Scopez — User guide",
+      "description": "Show scopes (both familiar & new) for DaVinci Resolve using a tablet, phone, laptop or any display with a browser connected to your network.",
+      "inLanguage": "en",
+      "dateModified": "2026-10-24",
+      "mainEntity": {
+        "@id": "https://vidarandersen.com/dmz/ghettoscopez/#guide"
+      }
+    }
+  ]
+}
+</script>
 <style>
 :root{color-scheme:dark;--bg:#101112;--panel:#191b1d;--line:#36393c;--text:#f4f4f2;--muted:#b5b8bb;--accent:#c5c8ca}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:1rem}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.7 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-wrap:anywhere}a{color:var(--accent);text-underline-offset:.22em}a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.skip{position:absolute;top:-100px;left:1rem;background:#101112;padding:.5rem;z-index:10}.skip:focus{top:1rem}.hero{display:block;width:100%;height:auto;aspect-ratio:1672/941;background:#191b1d}.wrap{max-width:1120px;margin:auto;padding:clamp(22px,5vw,64px)}.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}h1{font-size:clamp(2.3rem,7vw,4.5rem);line-height:1.06;letter-spacing:-.045em;margin:.6rem 0 1rem}h2{font-size:clamp(1.65rem,4vw,2.2rem);line-height:1.2;letter-spacing:-.025em;margin:0 0 1.2rem}h3{font-size:1.12rem;line-height:1.4;margin:1.8rem 0 .6rem}p{margin:.7rem 0 1.1rem}.lead{font-size:clamp(1.1rem,2.8vw,1.4rem);max-width:760px;color:#d2d4d5}.meta{color:var(--muted);font-size:.85rem}.actions{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.5rem 0}.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.6rem 1rem;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-weight:650;background:var(--panel)}.button.primary{background:var(--accent);color:#111;border-color:var(--accent);transition:background-color .16s ease,box-shadow .16s ease}.button.primary:hover{background:#e0e2e3;border-color:#e0e2e3;box-shadow:0 4px 18px rgba(197,200,202,.22)}.button.primary:active{background:#a9adb0;box-shadow:none}.contents{border-block:1px solid var(--line);padding:1.4rem 0;margin:2.5rem 0 0}.contents strong{display:block;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.contents ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.2rem 1.5rem;list-style:none;padding:0;margin:.7rem 0 0}.contents a{display:block;min-height:44px;padding:.4rem 0}section{padding:3rem 0;border-bottom:1px solid var(--line)}section:last-of-type{border:0}.steps{padding-left:1.5rem}.steps li{padding:0 0 1.1rem .35rem}.note{border-left:3px solid var(--accent);background:var(--panel);padding:1rem 1.2rem;margin:1.4rem 0}.note p:last-child{margin-bottom:0}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.4rem 0}.card{padding:1.2rem;background:var(--panel);border:1px solid var(--line);border-radius:8px}.card h3{margin-top:0}.card p:last-child{margin-bottom:0}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:#25282a;border-radius:3px;padding:.13em .3em}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--panel);padding:1rem;border:1px solid var(--line);border-radius:6px}pre code{background:none;padding:0}details{border-top:1px solid var(--line);padding:.8rem 0}summary{cursor:pointer;min-height:44px;padding:.35rem 0;font-weight:650}details p{padding-left:1rem}footer{padding:2rem 0;color:var(--muted);font-size:.85rem}ul{padding-left:1.4rem}li{margin:.3rem 0}@media(max-width:600px){body{font-size:16px}.wrap{padding:24px 20px}.contents ol{grid-template-columns:repeat(2,minmax(0,1fr));gap:.2rem 1rem}.cards{grid-template-columns:1fr}section{padding:2.2rem 0}.actions .button{flex:1 1 145px}.note{padding:.8rem 1rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button.primary{transition:none}}@media print{body{background:white;color:black}.hero{max-height:220px;object-fit:contain}.actions,.skip{display:none}a{color:black}.wrap{max-width:none;padding:20px}.card,.note,pre{background:white;color:black;border:1px solid #aaa}section{break-inside:avoid}.meta,.lead,.eyebrow,footer{color:#333}}
 
@@ -11,7 +90,7 @@ main.wrap{padding-top:0}.intro{position:relative;z-index:1;margin-top:calc(-100v
 @media(prefers-reduced-motion:reduce){.art-track{position:relative}.intro-track::after{display:none}.intro-track .intro{position:relative;top:auto}}
 @media print{.art-track{position:static}.intro-track{margin-top:0;padding-bottom:0}.intro-track::after{display:none}.intro-track .intro{position:static}}
 </style></head><body><a class="skip" href="#main">Skip to guide</a>
-<header class="masthead" id="top"><div class="art-track"><img id="header-art" class="hero" src="assets/ghettoscopez24-840.webp" srcset="assets/ghettoscopez24-840.webp 840w, assets/ghettoscopez24-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="Ghetto Scopez artwork" fetchpriority="high"></div><div class="intro-track wrap"><div class="intro"><div class="eyebrow">Ghetto Scopez / User guide</div><h1>See your grade.<br>On another screen.</h1><p class="lead">Show scopes (both familiar &amp; new) for DaVinci Resolve using a tablet, phone, laptop or any display with a browser connected to your network.</p><p class="meta">Viewer 0.2.50 · GTap 1.2.23 · 20261024</p>
+<header class="masthead" id="top"><div class="art-track"><img id="header-art" class="hero" src="assets/ghettoscopez24-840.webp" srcset="assets/ghettoscopez24-840.webp 840w, assets/ghettoscopez24-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="Ghetto Scopez artwork" fetchpriority="high"></div><div class="intro-track wrap"><div class="intro"><div class="eyebrow">Ghetto Scopez / User guide</div><h1>See your grade.<br>On another screen.</h1><p class="lead">Show scopes (both familiar &amp; new) for DaVinci Resolve using a tablet, phone, laptop or any display with a browser connected to your network.</p><p class="meta">Viewer 0.2.51 · GTap 1.2.23 · 20261024</p>
 <div class="actions"><a class="button primary" href="https://github.com/blacktar/ghetto-scopez/releases/latest">Download the latest release</a></div>
 </div></div></header>
 <script>(()=>{const n=1+Math.floor(Math.random()*34),im=document.getElementById('header-art');im.srcset=`assets/ghettoscopez${n}-840.webp 840w, assets/ghettoscopez${n}-1672.webp 1672w`;im.src=`assets/ghettoscopez${n}-1672.webp`;})();</script>
