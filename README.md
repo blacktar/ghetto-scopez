@@ -29,7 +29,8 @@ line tools are required. Node.js and Resolve are not bundled.
 
 The installer only uses administrator access for the system OFX plugin folder.
 `bash install.sh --check` checks requirements without installing.
-GTap is locally signed, not Apple notarized. The current binary's minimum OS
+GTap is currently locally signed. Apple notarization is pending Apple’s reactivation
+of the dormant Apple Developer ID. The current binary's minimum OS
 comes from its actual build metadata, not an inferred compatibility claim.
 
 ## What is included

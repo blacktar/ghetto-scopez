@@ -47,6 +47,7 @@ previously passed 96 GPU analysis cases, native/core/panel checks and scope imag
 comparisons. Physical-device performance depends on the machine and browser;
 these correctness results are not a frame-rate promise.
 
-The plugin is ad-hoc signed and not notarized. An installer preflight and isolated
+The plugin is ad-hoc signed. Apple notarization is pending Apple’s reactivation
+of the dormant Apple Developer ID. An installer preflight and isolated
 host smoke check are not a fresh-machine installation test. No automatic Resolve
 quit/relaunch or public-network hosting is performed by the installer.
