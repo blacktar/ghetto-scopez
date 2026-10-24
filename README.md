@@ -8,7 +8,7 @@ Made by **Vidar Andersen**. [Project website](https://vidarandersen.com/dmz/ghet
 
 ## Install and start
 
-This release includes **GTap 1.2.23** and **viewer 0.2.49**.
+This release includes **GTap 1.2.23** and **viewer 0.2.50**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
 DaVinci Resolve is required. The installer automatically installs the official

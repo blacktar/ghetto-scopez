@@ -56,3 +56,11 @@ The current release installer uses the signed universal Node-API host binary in
 release/scope-analysis.node. It installs the pinned official Node.js package only
 when needed. Published Mac ZIPs also include the three pinned host dependencies.
 The source build commands above remain available for contributors.
+
+## Standalone guide deployment
+
+`python3 scripts/package-guide.py OUTPUT_DIRECTORY` creates
+`ghettoscopes_YYYYMMDD_vVERSION.zip`, using the stamped release date and version.
+Unzip its contents into a static site's document root: `index.html`, `assets/`
+and `licences/` stay together. The ZIP also includes `deployment-manifest.json`
+and `SHA256SUMS` for per-file comparisons between guide versions.
