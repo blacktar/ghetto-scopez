@@ -1,6 +1,6 @@
 # Browser viewer
 
-Current viewer: **0.2.48**; release effect: **GTap 1.2.23**.
+Current viewer: **0.2.49**; release effect: **GTap 1.2.23**.
 
 Use [README.md](README.md) for installation or
 [the HTML guide](web/public/guide/index.html) for everyday use.

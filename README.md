@@ -8,30 +8,33 @@ Made by **Vidar Andersen**. [Project website](https://vidarandersen.com/dmz/ghet
 
 ## Install and start
 
-This release includes **GTap 1.2.23** and **viewer 0.2.48**.
+This release includes **GTap 1.2.23** and **viewer 0.2.49**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
-DaVinci Resolve, Node.js 20+ (a current LTS is recommended), and Apple's command
-line tools are required. Node.js and Resolve are not bundled.
+DaVinci Resolve is required. The installer automatically installs the official
+Apple-signed Node.js package if a compatible Node.js version is not already present.
+The release includes the compiled host component and browser dependencies; no
+command line tools or manual setup commands are needed.
 
-1. Download and unzip the complete release ZIP. Keep its folder together.
-2. Install [Node.js](https://nodejs.org/en/download) and, if needed, run
-   `xcode-select --install` and finish Apple's installation.
-3. Quit Resolve. In Terminal, change into the unzipped folder.
-4. Run `bash install.sh`. It installs dependencies, builds the local host component,
-   verifies GTap's checksum and signature, then asks for administrator access to
-   install the effect. It does not launch Resolve.
-5. Run `bash start.sh` and keep the Terminal window open.
-6. Open Resolve, add GTap after the output/display transform you want to measure,
-   and declare the matching BT.709 or BT.2020 RGB input primaries.
-7. Open the scope address shown in GTap's panel on another device on the same
-   network. Select **Start listening**, or **Fullscreen** to start automatically.
+1. Download and unzip the complete Mac release ZIP.
+2. Double-click **Install.command**. Quit Resolve if the installer asks; it waits
+   and continues automatically.
+3. Enter your Mac administrator password when requested. Setup installs the host
+   requirements and GTap, then starts the host and opens the HTML guide.
+4. Reopen Resolve, add GTap after the display/output transform you want to measure,
+   and choose the matching input declaration. Open the address in its panel on
+   another device, then select **Start listening** or **Fullscreen**.
 
-The installer only uses administrator access for the system OFX plugin folder.
-`bash install.sh --check` checks requirements without installing.
+For subsequent sessions, double-click **Start.command**. Keep its Terminal window
+open while using the scopes. Control-C stops the host.
+
+Node.js is downloaded from nodejs.org only when needed; the installer verifies its
+pinned SHA-256 checksum and Apple Developer ID signature before installing it.
+`bash install.sh --check` performs a read-only release preflight.
 GTap is currently locally signed. Apple notarization is pending Apple’s reactivation
-of the dormant Apple Developer ID. The current binary's minimum OS
-comes from its actual build metadata, not an inferred compatibility claim.
+of the dormant Apple Developer ID. macOS may require permission to open downloaded
+commands in Privacy & Security. The installer does not bypass macOS security controls
+or launch/quit Resolve for you.
 
 ## What is included
 

@@ -51,3 +51,8 @@ The plugin is ad-hoc signed. Apple notarization is pending Apple’s reactivatio
 of the dormant Apple Developer ID. An installer preflight and isolated
 host smoke check are not a fresh-machine installation test. No automatic Resolve
 quit/relaunch or public-network hosting is performed by the installer.
+
+The current release installer uses the signed universal Node-API host binary in
+release/scope-analysis.node. It installs the pinned official Node.js package only
+when needed. Published Mac ZIPs also include the three pinned host dependencies.
+The source build commands above remain available for contributors.
