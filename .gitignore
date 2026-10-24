@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+build/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+build-simulator/
+web/node_modules/
+.npm-cache/
+web/*.pem
+web/protocol.tmp
+
+web/.visual-deps/
+
+# Local session records and generated validation media
+/HANDOFF.md
+/AGENTS.md
+/docs/
+*.core
+core

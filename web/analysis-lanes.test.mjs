@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {AnalysisLanes} from './analysis-lanes.mjs';
+test('analysis concurrency rises only after sustained demand and stays CPU bounded',()=>{const c=new AnalysisLanes(4);for(let i=0;i<3;i++){c.observe(100,40);assert.equal(c.lanes,2);}c.observe(100,40);assert.equal(c.lanes,3);for(let i=0;i<40;i++)c.observe(100,40);assert.equal(c.lanes,4);});
+test('analysis concurrency backs off for slower input, ignores invalid samples and keeps a minimum lane',()=>{const c=new AnalysisLanes(8);for(let i=0;i<40;i++)c.observe(100,30);assert.equal(c.lanes,8);for(let i=0;i<40;i++)c.observe(10,100);assert.equal(c.lanes,1);c.observe(NaN,20);assert.equal(c.lanes,1);assert.equal(new AnalysisLanes(1).lanes,1);});

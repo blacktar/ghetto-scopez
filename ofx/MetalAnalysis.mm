@@ -1,0 +1,59 @@
+#import <Foundation/Foundation.h>
+#import <Metal/Metal.h>
+#include "MetalAnalysis.hpp"
+#include "MetalAnalysisSource.hpp"
+#include <algorithm>
+#include <mutex>
+#include <stdexcept>
+#include <chrono>
+#include <cstring>
+#include <cmath>
+namespace tap {
+namespace {
+struct Config {uint32_t width,height,x0,x1,y0,y1,levels,vs,n,mask,shards,stride;float mn,mx,zoom,tx,ty,lo,hi,kr,kg,kb;uint32_t offsets[13];uint32_t iso;float hueCenter,hueWidth,satMin,satMax,lumaMin,lumaMax;};
+struct Workspace {std::mutex mutex;id<MTLDevice> device;id<MTLCommandQueue> queue;id<MTLComputePipelineState> analyze,merge,colour;id<MTLBuffer> scratch,output,summary;};
+Workspace& workspace(){static Workspace w;return w;}
+std::string json(id object){NSError*e=nil;NSData*d=[NSJSONSerialization dataWithJSONObject:object options:NSJSONWritingSortedKeys error:&e];if(!d)throw std::runtime_error("Metal analysis JSON encoding failed");return std::string((const char*)d.bytes,d.length);}
+float unorder(uint32_t u){u=(u&0x80000000)?u^0x80000000:~u;float f;std::memcpy(&f,&u,4);return f;}
+void append32(std::vector<uint8_t>&b,uint32_t v){for(int i=0;i<4;i++)b.push_back(uint8_t(v>>(8*i)));}
+}
+std::vector<std::string> analysisRequests(const std::string&text){@autoreleasepool{std::vector<std::string> result;NSData*data=[NSData dataWithBytes:text.data() length:text.size()];id list=[NSJSONSerialization JSONObjectWithData:data options:0 error:nil];if([list isKindOfClass:[NSArray class]]&&[list count]<=4)for(id item in list)if([item isKindOfClass:[NSDictionary class]])result.push_back(json(item));return result;}}
+AnalysisResult metalAnalyze(const SharedRGB&rgb,int width,int height,const std::string&request,bool bt709,bool profile,double pixelAspect){@autoreleasepool{
+ auto begin=profile?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};auto&w=workspace();std::unique_lock<std::mutex>lock(w.mutex);
+ if(!rgb.data||!rgb.metalBuffer||rgb.size!=size_t(width)*height*3)throw std::runtime_error("Metal analysis requires leased capture buffer");
+ NSData*rd=[NSData dataWithBytes:request.data() length:request.size()];id parsed=[NSJSONSerialization JSONObjectWithData:rd options:NSJSONReadingMutableContainers error:nil];if(![parsed isKindOfClass:[NSDictionary class]])throw std::runtime_error("Invalid analysis request");NSMutableDictionary*d=parsed;
+ auto num=[&](NSString*key,double fallback){id v=d[key];return [v isKindOfClass:[NSNumber class]]?[v doubleValue]:fallback;};
+ Config c{};c.width=width;c.height=height;c.x0=num(@"x0",0);c.y0=num(@"y0",0);c.x1=num(@"x1",width);c.y1=num(@"y1",height);c.levels=num(@"levels",1024);c.vs=num(@"vectorSize",512);c.n=num(@"cubeResolution",32);c.mn=num(@"min",0);c.mx=num(@"max",1);c.zoom=num(@"vectorZoom",1);c.tx=num(@"twinX",1.25);c.ty=num(@"twinY",2.5);c.lo=num(@"lowCut",.25);c.hi=num(@"highCut",.75);c.kr=bt709?.2126f:.2627f;c.kb=bt709?.0722f:.0593f;c.kg=bt709?.7152f:.6780f;
+ if(c.x0>=c.x1||c.y0>=c.y1||c.x1>c.width||c.y1>c.height||c.width*c.height>16777216||(c.levels!=1024&&c.levels!=4096)||(c.vs!=512&&c.vs!=1024&&c.vs!=1536&&c.vs!=2048)||(c.n!=16&&c.n!=32&&c.n!=64&&c.n!=128)||!std::isfinite(c.mn)||!std::isfinite(c.mx)||c.mx<=c.mn||!std::isfinite(c.zoom)||c.zoom<1||c.zoom>16||!(c.tx>0)||!(c.ty>0)||c.lo<0||c.hi>1||c.lo>=c.hi)throw std::runtime_error("Invalid Metal scope configuration");
+ c.iso=[d[@"isolation"] isEqual:@"off"]||!d[@"isolation"]?0:1;c.hueCenter=num(@"hueCenter",25);c.hueWidth=num(@"hueWidth",20);c.satMin=num(@"satMin",.1);c.satMax=num(@"satMax",1);c.lumaMin=num(@"lumaMin",0);c.lumaMax=num(@"lumaMax",1);if(!std::isfinite(c.hueCenter)||c.hueCenter<0||c.hueCenter>360||!std::isfinite(c.hueWidth)||c.hueWidth<1||c.hueWidth>180||c.satMin<0||c.satMax>1||c.satMin>c.satMax||c.lumaMin>=c.lumaMax)throw std::runtime_error("Invalid colour isolation");
+ NSArray*active=d[@"activeScopes"];if(![active isKindOfClass:[NSArray class]]||active.count>11)throw std::runtime_error("Invalid active scopes");for(id scope in active){int i=[scope intValue];if(i<0||i>10)throw std::runtime_error("Invalid active scope");c.mask|=1u<<(i>=9?i+2:i);}if(num(@"waveColour",0)&& (c.mask&1))c.mask|=512;
+ uint32_t sizes[]={512*c.levels,1536*c.levels,3*c.levels,c.vs*c.vs,c.vs*c.vs,c.vs*c.vs,c.vs*c.vs,512*1024,(c.mask&256)?c.n*c.n*c.n:1,(c.mask&512)?512*c.levels*3:1,1,(c.mask&2048)?65536u:1u,(c.mask&4096)?360u:1u};
+ for(int i=0;i<13;i++){c.offsets[i]=UINT32_MAX;if(i!=10&&(c.mask&(1u<<i))){c.offsets[i]=c.stride;if(i!=9)c.stride+=sizes[i];}}
+ if(c.mask&512)c.offsets[9]=c.stride;
+ c.stride=std::max(1u,c.stride);c.shards=std::max(1u,std::min(8u,uint32_t((64ull*1024*1024)/(size_t(c.stride)*4))));
+ auto input=(__bridge id<MTLBuffer>)rgb.metalBuffer;id<MTLDevice> device=input.device;
+ if(w.device!=device){w.device=device;w.queue=[device newCommandQueue];NSError*error=nil;MTLCompileOptions*options=[MTLCompileOptions new];if(@available(macOS 15.0,*))options.mathMode=MTLMathModeSafe;else options.fastMathEnabled=NO;
+ auto library=[device newLibraryWithSource:@(analysisSource) options:options error:&error];if(!library)throw std::runtime_error(error.localizedDescription.UTF8String?:"Metal library failed");w.analyze=[device newComputePipelineStateWithFunction:[library newFunctionWithName:@"analyze"] error:&error];w.merge=[device newComputePipelineStateWithFunction:[library newFunctionWithName:@"merge"] error:&error];w.colour=[device newComputePipelineStateWithFunction:[library newFunctionWithName:@"waveformColour"] error:&error];if(!w.analyze||!w.merge||!w.colour)throw std::runtime_error("Metal analysis pipeline failed");w.scratch=nil;w.output=nil;w.summary=nil;}
+ auto allocate=[&](id<MTLBuffer> __strong &b,size_t size){if(!b||b.length!=size)b=[device newBufferWithLength:size options:MTLResourceStorageModeShared];if(!b)throw std::runtime_error("Metal analysis allocation failed");};
+ allocate(w.scratch,size_t(c.stride)*c.shards*4);allocate(w.output,(size_t(c.stride)+((c.mask&512)?sizes[9]:0))*4);allocate(w.summary,size_t(c.shards)*64*4);
+ // Workspace is serial and bounded: <320 MiB scratch+merged planes at maximum configuration.
+ auto command=[w.queue commandBuffer];command.label=@"GTap full-pixel scope analysis";auto clear=[command blitCommandEncoder];[clear fillBuffer:w.scratch range:NSMakeRange(0,w.scratch.length) value:0];[clear endEncoding];auto*partials=static_cast<uint32_t*>(w.summary.contents);std::fill_n(partials,size_t(c.shards)*64,0);for(uint32_t sh=0;sh<c.shards;sh++)for(int ch=0;ch<4;ch++)partials[sh*64+ch*8]=UINT32_MAX;
+ auto encoder=[command computeCommandEncoder];[encoder setComputePipelineState:w.analyze];[encoder setBuffer:input offset:0 atIndex:0];[encoder setBuffer:w.scratch offset:0 atIndex:1];[encoder setBuffer:w.summary offset:0 atIndex:2];[encoder setBytes:&c length:sizeof(c) atIndex:3];NSUInteger threads=std::min<NSUInteger>(256,w.analyze.maxTotalThreadsPerThreadgroup);threads=threads/w.analyze.threadExecutionWidth*w.analyze.threadExecutionWidth;uint32_t pixels=(c.x1-c.x0)*(c.y1-c.y0);[encoder dispatchThreadgroups:MTLSizeMake(((pixels+7)/8+threads-1)/threads,1,1) threadsPerThreadgroup:MTLSizeMake(threads,1,1)];[encoder endEncoding];
+ auto merge=[command computeCommandEncoder];[merge setComputePipelineState:w.merge];[merge setBuffer:w.scratch offset:0 atIndex:0];[merge setBuffer:w.output offset:0 atIndex:1];[merge setBytes:&c length:sizeof(c) atIndex:3];[merge dispatchThreads:MTLSizeMake(c.stride,1,1) threadsPerThreadgroup:MTLSizeMake(std::min<NSUInteger>(256,w.merge.maxTotalThreadsPerThreadgroup),1,1)];[merge endEncoding];
+ if(c.mask&512){auto colour=[command computeCommandEncoder];[colour setComputePipelineState:w.colour];[colour setBuffer:input offset:0 atIndex:0];[colour setBuffer:w.output offset:0 atIndex:1];[colour setBytes:&c length:sizeof(c) atIndex:3];NSUInteger ct=std::min<NSUInteger>(256,w.colour.maxTotalThreadsPerThreadgroup);[colour dispatchThreadgroups:MTLSizeMake(512,c.levels/1024,1) threadsPerThreadgroup:MTLSizeMake(ct,1,1)];[colour endEncoding];}
+ [command commit];[command waitUntilCompleted];if(command.status!=MTLCommandBufferStatusCompleted)throw std::runtime_error("Metal analysis command failed");
+ uint32_t combined[64]{};for(int ch=0;ch<4;ch++)combined[ch*8]=UINT32_MAX;for(uint32_t sh=0;sh<c.shards;sh++)for(int k=0;k<64;k++){uint32_t v=partials[sh*64+k];if(k<32&&k%8==0)combined[k]=std::min(combined[k],v);else if(k<32&&k%8==1)combined[k]=std::max(combined[k],v);else combined[k]+=v;}auto*s=combined;
+ AnalysisResult result;if(profile)result.gpuMs=(command.GPUEndTime-command.GPUStartTime)*1000;result.scratchBytes=w.scratch.length+w.output.length+w.summary.length;
+ auto*out=static_cast<const uint32_t*>(w.output.contents);uint32_t occupied=0;
+ auto varSize=[](uint32_t v){uint32_t n=1;while(v>=128){v>>=7;n++;}return n;};auto appendVar=[&](uint32_t v){while(v>=128){result.body.push_back(uint8_t(v)|128);v>>=7;}result.body.push_back(uint8_t(v));};
+ for(int i=0;i<13;i++){if(i==10){ // One-shot selection preview is sampled only on an explicit request.
+ if(num(@"previewRequest",0)>0){if(!std::isfinite(pixelAspect)||pixelAspect<=0)pixelAspect=1;double aspect=width*pixelAspect/height;uint32_t pw=aspect>=1?320:std::max(1u,uint32_t(std::round(320*aspect))),ph=aspect>=1?std::max(1u,uint32_t(std::round(320/aspect))):320;append32(result.body,0);append32(result.body,pw*ph);for(uint32_t y=0;y<ph;y++)for(uint32_t x=0;x<pw;x++){uint32_t sx=std::min(width-1,int((x+.5)*width/pw)),sy=std::min(height-1,int((y+.5)*height/ph)),at=(sy*width+sx)*3,colour=0xff000000;for(int ch=0;ch<3;ch++){float v=rgb.data[at+ch];uint32_t q=std::isfinite(v)?uint32_t(std::floor(std::clamp(double(v),0.,1.)*255+.5)):0;colour|=q<<(8*ch);}append32(result.body,colour);}}
+ else{append32(result.body,1);append32(result.body,0);}
+continue;}uint32_t nonzero=0,previous=UINT32_MAX;size_t variable=0;if(c.offsets[i]!=UINT32_MAX)for(uint32_t k=0;k<sizes[i];k++){uint32_t v=out[c.offsets[i]+k];if(v){nonzero++;variable+=varSize(k-previous)+varSize(v);previous=k;}}size_t dense=size_t(sizes[i])*4,sparse=size_t(nonzero)*8;uint32_t mode=variable<std::min(dense,sparse)?2:sparse<dense?1:0;append32(result.body,mode);append32(result.body,mode?nonzero:sizes[i]);if(c.offsets[i]==UINT32_MAX)continue;previous=UINT32_MAX;for(uint32_t k=0;k<sizes[i];k++){uint32_t v=out[c.offsets[i]+k];if(mode&&!v)continue;if(mode==2){appendVar(k-previous);appendVar(v);previous=k;}else{if(mode==1)append32(result.body,k);append32(result.body,v);}}if(i==8)occupied=nonzero;}
+ NSMutableArray*stats=[NSMutableArray new],*raw=[NSMutableArray new],*split=[NSMutableArray new];NSArray*names=@[@"R",@"G",@"B",@"Yprime"];
+ for(int ch=0;ch<4;ch++){uint32_t at=ch*8;id mn=s[at]!=UINT32_MAX?@(unorder(s[at])):[NSNull null],mx=s[at]!=UINT32_MAX?@(unorder(s[at+1])):[NSNull null];[stats addObject:@{@"name":names[ch],@"min":mn,@"max":mx,@"invalid":@(s[at+3]),@"under":@(s[at+4]),@"over":@(s[at+5]),@"viewportUnder":@(s[at+6]),@"viewportOver":@(s[at+7])}];if(ch<3)[raw addObject:@{@"name":[names[ch] stringByAppendingString:@"code"],@"min":mn,@"max":mx,@"invalid":@(s[at+3])}];}
+ NSArray*bands=@[@"low",@"mid",@"high"];uint32_t outside=0;for(int b=0;b<3;b++){[split addObject:@{@"name":bands[b],@"pixels":@(s[32+b*3]),@"plotted":@(s[33+b*3]),@"outside":@(s[34+b*3])}];outside+=s[34+b*3];}
+ NSMutableDictionary*twin=[NSMutableDictionary new];for(int p=0;p<2;p++){uint32_t at=41+p*4;twin[p==0?@"upper":@"lower"]=@{@"plotted":@(s[at]),@"outside":@(s[at+1]),@"invalid":@(s[at+2]),@"gamut":@(s[at+3])};}
+ result.config=request;result.summary=json(@{@"stats":stats,@"rawStats":raw,@"splitStats":split,@"twinStats":twin,@"vectorOutside":@(outside),@"cubeStats":@{@"plotted":(c.mask&256)?@(s[49]):@0,@"outside":(c.mask&256)?@(s[50]):@0,@"invalid":(c.mask&256)?@(s[51]):@0,@"occupied":@(occupied)}});if(profile)result.totalMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();return result;
+}}
+}

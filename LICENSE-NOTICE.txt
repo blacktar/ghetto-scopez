@@ -1,0 +1,8 @@
+Copyright © 2026 Vidar Andersen.
+
+Ghetto Scopez and GTap original source code, documentation and supplied artwork
+are licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International (CC BY-NC-SA 4.0), to the extent the author holds those rights.
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+See LICENSE for the full terms. Attribute Vidar Andersen and identify changes.
+Third-party components retain their respective licences. See THIRD-PARTY-NOTICES.txt.

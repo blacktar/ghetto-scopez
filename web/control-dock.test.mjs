@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {dockMayHide} from './public/control-dock.mjs';
+test('dock hides when idle in either viewing mode and stays available for grading interaction and keyboard focus',()=>{const idle={fullscreen:true,settings:false,dragging:false,hovering:false,keyboardFocus:false};assert.equal(dockMayHide(idle),true);for(const key of ['settings','dragging','hovering','keyboardFocus'])assert.equal(dockMayHide({...idle,[key]:true}),false,key);assert.equal(dockMayHide({...idle,fullscreen:false}),true);});

@@ -1,0 +1,4 @@
+import {performance} from 'node:perf_hooks';
+import {scopes} from './scopes.mjs';import {packPlanes,scopePacket,unpackScope} from './public/scope-wire.mjs';
+const samples=[];let previous;for(let i=0;i<12;i++){const t0=performance.now(),data=scopes('sine',i*.04,{bits:12},previous),t1=performance.now(),body=packPlanes(data,data.indices),t2=performance.now(),packet=scopePacket(data,i,1,0,body),t3=performance.now();unpackScope(packet.buffer);const t4=performance.now();previous=data;samples.push({analysis_ms:t1-t0,packing_ms:t2-t1,packet_ms:t3-t2,decode_ms:t4-t3,bytes:packet.length});}
+const measured=samples.slice(2);console.log(JSON.stringify({fixture:'sine',bits:12,source:'256x64, every pixel',runs:measured.length,mean:Object.fromEntries(Object.keys(measured[0]).map(k=>[k,measured.reduce((a,s)=>a+s[k],0)/measured.length])),samples:measured},null,2));

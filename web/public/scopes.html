@@ -1,0 +1,216 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ghetto Scopez (v0.2.48, 20261024)</title><script>document.documentElement.classList.add("debug-off")</script><link rel="stylesheet" href="style.css"><style>main{max-width:none;padding:20px}header{max-width:none;padding:18px 24px}.toolbar{display:flex;gap:12px;align-items:center;margin-bottom:18px}.toolbar select{width:180px}.toolbar a{color:#aaa;font-size:12px}#scopes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.scopeplot{height:280px;position:relative;padding:10px 15px 15px 42px}.scopeplot canvas{height:100%;width:100%}.ticks{position:absolute;top:10px;left:8px;bottom:15px;font-size:10px;display:flex;flex-direction:column;justify-content:space-between;color:#999}.xaxis{font-size:9px;text-align:center;color:#888;padding:0 10px 10px}.scope[data-scope="3"] canvas{width:auto;max-width:100%;height:100%;aspect-ratio:1;margin:auto}.metrics{grid-template-columns:repeat(6,1fr);margin:0 0 18px}.metrics strong{font-size:21px}.metrics>div{padding:14px}#panel{padding:18px;border:1px solid #444;margin-bottom:18px;display:flex;gap:20px;flex-wrap:wrap}#panel[hidden],section[hidden]{display:none!important}#panel label{display:flex;align-items:center;flex:none}#panel input{width:auto}.monitor header,.monitor .toolbar,.monitor #status{display:none!important}.monitor #signal{display:none!important}.monitor main{padding:12px}.monitor .scopeplot{height:calc((100vh - 180px)/2)}@media(max-width:650px){#scopes{grid-template-columns:1fr}.xaxis{font-size:9px;text-align:center;color:#888;padding:0 10px 10px}.scope[data-scope="3"] canvas{width:auto;max-width:100%;height:100%;aspect-ratio:1;margin:auto}.metrics{grid-template-columns:repeat(3,1fr)}.toolbar{flex-wrap:wrap}.monitor .scopeplot{height:260px}}.probe{font:11px monospace;padding:8px 14px;color:#bbb;min-height:30px}.monitor .scopeplot{height:calc((100vh - 260px)/2)}.monitor main{height:100dvh;display:flex;flex-direction:column;overflow:hidden}.monitor .metrics{flex:none;margin-bottom:8px}.monitor #scopes{flex:1;min-height:0;grid-template-rows:repeat(2,minmax(0,1fr))}.monitor .scope{min-height:0;display:flex;flex-direction:column}.monitor .scopeplot{height:auto!important;min-height:0;flex:1}.monitor .scopehead{padding:10px}.monitor .xaxis{padding-bottom:5px}.monitor .probe{min-height:0;padding:4px;font-size:9px}.monitor #analysis{flex:none;max-height:4em;overflow:auto;margin:6px 0}.debug-off [data-debug],.debug-off .metrics,.debug-off #signal,.debug-off #analysis,.debug-off header p,.debug-off .scope .probe,.debug-off .band-summary span+span,.debug-off .qa-lossless,.debug-off .qa-overlay,.debug-off #qa-palette{display:none!important}.debug-off.signal-ready #status{display:none!important}#signalstate{font-size:11px;color:#aaa;margin-left:6px}.heading-line{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}#connection{border:0;padding:0;margin:0;font-size:12px;color:#aaa;letter-spacing:0;white-space:nowrap}#connection.connected,#connection.connected #hoststate{color:#86bb92}#connection.disconnected,#connection.disconnected #hoststate{color:#d98080}header>#fullscreen{margin-left:auto}.view-tabs{display:flex;gap:24px;border-bottom:1px solid #393939;margin-bottom:20px}.view-tabs [role="tab"]{border:0;border-bottom:2px solid transparent;background:none;color:#888;padding:12px 2px;font-size:13px}.view-tabs [aria-selected="true"]{border-bottom-color:#ddd;color:#eee}.view-tabs [role="tab"]:focus-visible{outline:1px solid #aaa;outline-offset:3px}#scopeview[hidden]{display:none!important}.monitor .view-tabs{display:flex;justify-content:center;flex:none;gap:24px;margin-bottom:6px}.monitor .view-tabs [role="tab"]{padding:6px 12px;min-height:36px}.monitor #panel:not([hidden]){display:flex;flex:1;min-height:0;overflow:auto;align-content:flex-start}.monitor #scopeview{display:flex;flex:1;min-height:0;flex-direction:column}</style><header><div><div class="heading-line"><h1>Ghetto Scopez (v0.2.48, 20261024)</h1><span id="connection" role="status" aria-live="polite">Host: <span id="hoststate">connecting</span><span id="signalstate"> · signal stopped</span><span id="fpsreadout" hidden style="color:#aaa;margin-left:10px;font-variant-numeric:tabular-nums"></span></span></div><p>DECLARED INPUT · ORIGINAL PIXELS · EXACT COUNTS</p></div><div id="fullscreencontrols"><button id="fullscreenmagnify" class="quiet" title="Cycle vectorscope magnification">1×</button><button id="fullscreensmooth" title="Spatial trace smoothing; measured counts unchanged" class="quiet" aria-pressed="false">Smooth</button><label>Gain <output id="fullscreengainvalue">1×</output><input id="fullscreengain" aria-label="Trace gain fullscreen" type="range" min="-4" max="4" step=".05" value="0"></label><label>Brightness <output id="fullscreenbrightnessvalue">100%</output><input id="fullscreenbrightness" aria-label="Trace brightness fullscreen" type="range" min="10" max="400" step="5" value="100"></label><label id="snapopacitylabel" hidden>Overlay <output id="snapopacityvalue">25%</output><input id="snapopacity" aria-label="Snapshot overlay opacity" type="range" min="0" max="100" step="1" value="25"></label></div><button id="fullscreen" class="quiet">Fullscreen</button></header><main><nav class="view-tabs" role="tablist" aria-label="View"><button id="scopestab" role="tab" aria-selected="true" aria-controls="scopeview">Scopes</button><button id="settings" role="tab" aria-selected="false" aria-controls="panel" tabindex="-1">Settings</button></nav><div id="scopeview" role="tabpanel" aria-labelledby="scopestab"><div class="toolbar"><button id="start">Start listening</button><button id="magnify" class="quiet" title="Cycle vectorscope magnification">Vectors 1×</button></div><div class="metrics"><div><small>MAC COMPUTE</small><strong id="compute">—</strong></div><div><small>CPU DRAW SUBMISSION</small><strong id="render">—</strong></div><div><small>RECEIVED / DRAWN</small><strong id="refresh">—</strong></div><div><small>PAYLOAD RATE</small><strong id="bandwidth">—</strong></div><div><small>DISPLAY DROPS / SKIPS</small><strong id="drops">—</strong></div><div><small>SOURCE PIXELS</small><strong id="samples">—</strong></div></div><p id="isolationstatus" hidden style="color:#ccc;font-size:12px"></p><p id="signal" style="color:#aaa;font:11px monospace;line-height:1.5"></p><div id="addscopebar" aria-label="Empty scope slots" hidden></div><div id="scopes"></div><div id="emptyscopes" hidden><span>No scopes selected</span><button id="chooselayout" class="quiet" type="button">Choose layout</button></div><p id="analysis" style="font:11px monospace;color:#aaa;line-height:1.7"></p><p id="status">Start to receive Resolve pixels. The OFX tap or a published Resolve frame must be available.</p></div><div id="panel" role="tabpanel" aria-labelledby="settings" hidden><fieldset id="settingsfiles"><legend>Settings files</legend><p><a href="guide/index.html" target="_blank" rel="noopener" style="color:inherit">User guide ↗</a></p><p>Active: <strong id="settingsfilename">Default</strong></p><div class="settings-fields"><button id="loadsettings" class="quiet">Load settings…</button><input id="settingsfile" type="file" accept=".json,application/json" hidden><button id="savesettings" class="quiet">Save settings</button><button id="defaultsettings" class="quiet">Reset to defaults</button></div><p id="settingsmessage" role="status" class="settings-help"></p></fieldset><fieldset><legend>Layout</legend><div class="settings-fields"><label>Layout<select id="layoutmode"><option value="top">Group above</option><option value="bottom">Group below</option><option value="left" selected>Group left</option><option value="right">Group right</option><option value="grid">Balanced grid</option><option value="row">Single row</option><option value="column">Single stack</option></select></label><label id="layoutsharelabel">Scope group space <output id="layoutsharevalue">40%</output><input id="layoutshare" aria-label="Scope group space" type="range" min="20" max="80" value="40" step="1"></label><div id="layoutsettings" style="display:flex;gap:12px;flex-wrap:wrap;width:100%"></div><button id="resetlayout" class="quiet">Reset scope layout</button></div></fieldset><fieldset><legend>3D colour cube</legend><div class="settings-fields"><label>Colour resolution<select id="cuberesolution"><option value="16">16³ · up to 4,096 points</option><option value="32" selected>32³ · up to 32,768 points</option><option value="64">64³ · up to 262,144 points</option><option value="128">128³ · up to 2,097,152 points</option></select></label></div><p class="settings-help">Every source pixel contributes. Resolution groups colours into bins; density records pixel counts. Drag to rotate, pinch or wheel to zoom. Uses the measurement level range; values outside it are reported.</p></fieldset><fieldset><legend>Waveform</legend><div class="settings-fields"><label>Waveform colour<select id="wavecolour" aria-label="Waveform colour"><option value="mono">Monochrome</option><option value="source">Source colours</option><option value="false">False colour by level</option></select></label></div><p class="settings-help">Source colours tint the luma trace with the mean source hue at each bin. False colour maps signal levels from blue through cyan, green and yellow to red.</p></fieldset><fieldset><legend>Snapshots</legend><p class="settings-help">Use Snapshot in a scope header to save up to three states. A, B and C toggle red, green and blue overlays independently. A fourth capture replaces the oldest. Controls → Overlay sets opacity. Saved locally in this browser; clearing browser data removes them.</p><p id="snapshotusage">0 MiB cached</p><button id="clearsnapshots" type="button" class="quiet">Clear all snapshots</button><p id="snapshotmessage" role="status" class="settings-help"></p></fieldset><fieldset><legend>Colour isolation</legend><div class="settings-fields"><label>Analyse<select id="isolation"><option value="off">All colours</option><option value="skin">Skin hue range</option><option value="colour">Selected colour</option></select></label><div id="isolationcontrols" hidden><div class="settings-fields"><button id="captureselection" type="button" class="quiet">Capture selection preview</button><button id="pickselection" type="button" class="quiet" disabled>Pick colour from preview</button><label>Choose colour<input id="isolationcolour" type="color" value="#ca7844"></label></div><details><summary>Refine selection</summary><div class="settings-fields"><label>Hue centre (°)<input id="hueCenter" type="number" min="0" max="360" step="1" value="25"></label><label>Hue tolerance (±°)<input id="hueWidth" type="number" min="1" max="180" value="20"></label><label>Saturation min<input id="satMin" type="number" min="0" max="1" step=".01" value=".1"></label><label>Saturation max<input id="satMax" type="number" min="0" max="1" step=".01" value="1"></label><label>Luma min<input id="lumaMin" type="number" min="-16" max="16" step=".01" value="0"></label><label>Luma max<input id="lumaMax" type="number" min="-16" max="16" step=".01" value="1"></label></div></details></div></div><p class="settings-help">Filters all scope measurements inside the source region. Skin is an adjustable hue qualifier, not face detection or a universal skin target. Use Capture source preview to inspect the selection; excluded pixels are dimmed. Saturation uses HSV; luma is encoded Y′.</p></fieldset><fieldset><legend>Vectorscopes</legend><div class="settings-fields"><label>Magnification<select id="vectorzoom"><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>Lows / mids boundary (Y′)<input id="lowcut" type="number" min="0" max="1" step=".01" value=".25"></label><label>Mids / highs boundary (Y′)<input id="highcut" type="number" min="0" max="1" step=".01" value=".75"></label><label><input id="vectorcolour" type="checkbox" checked>Colour vectorscope traces</label><label><input id="skinline" type="checkbox" checked>Skin-tone guide</label></div></fieldset><fieldset><legend>DoubleD</legend><div class="settings-fields"><label>DoubleD orientation<select id="twinorientation"><option value="horizontal">Horizontal</option><option value="vertical" selected>Vertical</option></select></label><label>DoubleD sizing<select id="twinfit"><option value="fill">Fill panel</option><option value="contain">Original proportions</option></select></label><label><input id="twincolour" type="checkbox" checked>Colour DoubleD traces</label><label><input id="twinneutral" type="checkbox">DoubleD neutral-axis guide</label></div></fieldset><fieldset><legend>Trace appearance</legend><div class="settings-fields"><label><input id="smooth" type="checkbox">Smooth vector / DoubleD traces</label><label>Trace gain <output id="gainvalue">1×</output><input id="gain" aria-label="Trace gain" type="range" min="-4" max="4" step=".05" value="0"></label><label>Trace brightness <output id="brightnessvalue">100%</output><input id="brightness" aria-label="Trace brightness" type="range" min="10" max="400" step="5" value="100"></label><label><input id="targets" type="checkbox" checked>Calibrated references</label><label>Display quality<select id="quality" aria-label="Rendering quality"><option value="auto" selected>Auto</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select><span id="qualityhint">Display only · full source precision</span></label></div></fieldset><details class="settings-advanced"><summary>Region and measurement</summary><fieldset><legend>Region of interest</legend><div class="settings-fields"><div class="roi-controls"><label>Source x start<input id="x0" type="number" min="0" step="1" value="0" style="width:85px"></label><label>Source x end (exclusive)<input id="x1" type="number" min="1" step="1" placeholder="Full" style="width:85px"></label><label>Source y start<input id="y0" type="number" min="0" step="1" value="0" style="width:85px"></label><label>Source y end (exclusive)<input id="y1" type="number" min="1" step="1" placeholder="Full" style="width:85px"></label><button id="applyroi" class="quiet">Apply ROI</button><button id="zoomx" class="quiet">Horizontal ×2</button><button id="panleft" class="quiet">Pan left</button><button id="panright" class="quiet">Pan right</button><button id="resetroi" class="quiet">Reset region</button><div class="preview-tools" style="display:flex;align-items:center;gap:12px;flex-basis:100%"><button id="capturepreview" class="quiet" type="button">Capture source preview</button><span id="previewstatus">Capture a source image to select a region.</span></div><div id="roimap" hidden aria-label="Select source region on captured image" style="position:relative;max-width:100%;width:640px;touch-action:none;flex:none"><canvas id="sourcepreview" style="width:100%;height:100%;display:block"></canvas><div id="roibox" style="position:absolute;border:2px solid #ddd;background:#ffffff18;pointer-events:none"></div></div><span id="roistatus"></span></div></div></fieldset><fieldset><legend>Measurement display</legend><div class="settings-fields"><label>Level resolution<select id="precision"><option value="10">10-bit / 1024 levels</option><option value="12">12-bit / 4096 levels</option></select></label><label>Axis units<select id="axisunit"><option value="signal">Normalized signal</option><option value="ire">IRE</option><option value="code">Equivalent RGB/Y codes</option></select></label><label>Level min<input id="levelmin" type="number" value="0" step="0.001" style="width:90px"></label><label>Level max<input id="levelmax" type="number" value="1" step="0.001" style="width:90px"></label></div></fieldset><div class="settings-actions"><button data-range="0,1" class="quiet">Full</button><button data-range="0,0.1" class="quiet">Shadows ×10</button><button data-range="0.9,1" class="quiet">Highlights ×10</button><button data-range="-0.125,1.125" class="quiet">Foot/headroom</button></div></details><details class="settings-advanced"><summary>Device name</summary><fieldset><legend>Device</legend><div class="settings-fields"><label>Device name<input id="viewerlabel" maxlength="48" aria-label="Viewer label" style="width:190px;max-width:190px"></label><button id="savelabel" class="quiet">Save name</button></div></fieldset></details><div class="debug-switch"><button id="showfps" type="button" class="quiet" aria-pressed="false">FPS: Off</button><label><input id="debug" type="checkbox">Debug mode</label></div><fieldset data-debug><legend>Debug tools</legend><p class="settings-help">Test inputs and diagnostics. Resolve signal metadata comes from GTap.</p><div id="debug-source-controls" class="settings-fields"><label>Test source<select id="inputsource" aria-label="Scope input"><option value="synthetic">Synthetic fixtures</option><option value="resolve" selected>Resolve signal</option></select></label><label>Test pattern<select id="fixture" aria-label="Fixture"><option value="ramp">Grayscale ramp</option><option value="bars">RGB color bars</option><option value="ramp10">1024-step 10-bit ramp</option><option value="ramp12">4096-step 12-bit ramp</option><option value="bars75">75% RGB bars</option><option value="excursions">Under/over + nonfinite</option><option value="impulse">Single-pixel red impulse</option><option value="tonal-casts">Tonal colour casts</option><option value="sine">Animated RGB waves</option></select></label><a href="/">Transport tests</a></div><div class="settings-fields"><label>Source encoding<select id="sourceformat"><option value="rgb-full">RGB full</option><option value="rgb-video">RGB video / narrow</option><option value="ycbcr-video">YCbCr video / narrow</option></select></label><label>Matrix<select id="matrix"><option value="bt709">BT.709</option><option value="bt2020-ncl">BT.2020 non-constant luma</option></select></label><label>Code reference<select id="codebits"><option>10</option><option>12</option></select></label><span data-debug id="backend"></span></div></fieldset></div></main><dialog id="emptylayoutdialog" aria-labelledby="emptylayouttitle"><form id="emptylayoutform"><h2 id="emptylayouttitle">Set up scopes</h2><label>Layout<select id="emptylayoutmode"></select></label><div id="emptylayoutslots"></div><p id="emptylayouterror" role="status"></p><div class="emptylayout-actions"><button id="cancelemptylayout" type="button" class="quiet">Cancel</button><button type="submit">Create scopes</button></div></form></dialog><script>if(new URLSearchParams(location.search).has('visual')){document.documentElement.classList.add('visual-test');const palette=document.createElement('div');palette.id='qa-palette';palette.style.cssText='display:flex;height:24px;width:1000px;margin:auto';for(const color of ['#000000','#090909','#1a1a1a','#ffffff','#ff4137','#44ee65','#4983ff']){const s=document.createElement('div');s.style.cssText='flex:1;background:'+color;s.dataset.color=color;palette.append(s);}document.body.prepend(palette);}</script><style>.visual-test .view-tabs,.visual-test header,.visual-test .metrics,.visual-test #panel,.visual-test #analysis,.visual-test #signal,.visual-test #status{display:none!important}.visual-test main{width:1000px;padding:10px}.visual-test .scopeplot{height:240px}.visual-test .toolbar{margin-bottom:8px}.visual-test .probe{min-height:0;padding:4px;font-size:9px}</style><script src="/vendor/NoSleep.min.js"></script><script type="module" src="boot.mjs"></script><style>
+body.monitor .view-tabs{display:none}
+body.monitor #fullscreencontrols{flex-wrap:nowrap;gap:10px;overflow-x:auto;justify-content:flex-start;width:max-content;max-width:100%}
+body.monitor #fullscreencontrols>*{flex-shrink:0}
+#fullscreencontrols [role="tab"]{border:0;border-bottom:2px solid transparent;background:none;color:#888;padding:6px 10px;min-height:34px;font-size:12px}
+#fullscreencontrols [role="tab"][aria-selected="true"]{border-bottom-color:#ddd;color:#eee}
+#fullscreencontrols [role="tab"]:focus-visible{outline:1px solid #aaa;outline-offset:-2px}
+</style><style>
+#panel:not([hidden]),.monitor #panel:not([hidden]){display:block;padding:16px;border:0;background:#101010}
+#panel fieldset{border:0;border-top:1px solid #333;margin:0 0 20px;padding:14px 0 0;min-width:0}
+#panel legend{padding:0 12px 0 0;font-size:14px;color:#ddd;letter-spacing:0}
+#panel .settings-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px 24px;align-items:start}
+#panel label{display:flex;flex-direction:column;align-items:stretch!important;gap:8px;font-size:12px;min-width:0;line-height:1.4}
+#panel label:has(input[type="checkbox"]){flex-direction:row;align-items:center!important;min-height:36px}
+#panel input[type="checkbox"]{width:18px;height:18px;flex:none;margin:0 8px 0 0}
+#panel select,#panel input:not([type="checkbox"]){width:100%!important;max-width:none!important;min-height:36px}
+#panel input[type="range"]{min-height:32px;padding:0}
+#panel #layoutsettings{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px!important}
+#panel .settings-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+#panel .settings-advanced{border-top:1px solid #333;margin-bottom:16px;padding-top:12px}
+#panel summary{cursor:pointer;font-size:13px;color:#bbb;min-height:36px;padding:8px 0}
+#panel .settings-advanced[open] summary{margin-bottom:16px;color:#eee}
+#panel .settings-advanced fieldset{border:0}
+#panel .debug-switch{padding:12px 0;border-top:1px solid #333}
+#panel .settings-help,#panel #qualityhint{font-size:11px;line-height:1.5;color:#888;letter-spacing:0}
+#panel #resetlayout,#panel #savelabel{justify-self:start;align-self:end;min-height:36px}
+@media(max-width:600px){#panel .settings-fields{grid-template-columns:1fr}}
+</style><style>#panel .roi-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#panel .roi-controls>label{flex:1 1 150px}#panel #roistatus{font-size:11px;color:#888;line-height:1.5}#panel #debug-source-controls{margin-bottom:16px}</style><style>
+.scope-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr);min-width:0;min-height:0;gap:8px}
+.scope-strip[hidden]{display:none!important}
+.scopes-page #scopes .scope-strip>.scope{min-width:0;min-height:0}
+.scope-strip .scopehead{justify-content:center;text-align:center;flex-wrap:wrap}
+.scope-strip .scopehead .unit{width:100%;font-size:9px}
+.scope-strip .scopehead>span:first-child{width:100%}
+.visual-test .scope-strip .scopeplot{height:180px}
+</style></html>
+<style>
+#scopes.split-layout{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto}.split-layout .scopehead{gap:8px;flex-wrap:wrap;padding:12px}.split-layout .scopehead .unit{font-size:9px;letter-spacing:0}.split-layout .scopeplot{height:260px}.split-layout .scope[data-scope="7"] .scopeplot{height:300px}.split-layout .scope[data-scope="7"] canvas{width:auto;max-width:100%;aspect-ratio:2/1;margin:auto}.split-layout .scope[data-scope="4"] canvas,.split-layout .scope[data-scope="5"] canvas,.split-layout .scope[data-scope="6"] canvas{width:auto;max-width:100%;aspect-ratio:1;margin:auto}.split-layout .probe{font-size:10px;line-height:1.5}.monitor .split-layout .scopeplot{height:auto}.visual-test #scopes.split-layout .scopeplot{height:215px}.visual-test #scopes.split-layout .scope[data-scope="7"] .scopeplot{height:245px}.monitor #scopes.split-layout{grid-template-rows:repeat(2,minmax(0,1fr))}
+</style><style>.visual-test main{width:min(1000px,100%)}.visual-test #qa-palette{max-width:100%}#scopes.split-layout .scope{min-width:0}.split-layout .scopeplot{min-width:0}.split-layout .xaxis{line-height:1.5}</style><style>.band-summary{font:10px monospace;color:#aaa;padding:5px 12px}.visual-test .band-summary{font-size:9px}</style><style>.visual-test #scopes.split-layout .scopeplot{height:180px}.visual-test #scopes.split-layout .scope[data-scope="7"] .scopeplot{height:200px}.visual-test .split-layout .scopehead{font-size:9px;padding:9px}.visual-test .split-layout .xaxis{font-size:8px}</style><style>.monitor .metrics>div{padding:8px 10px}.monitor .metrics strong{font-size:16px;margin-top:5px}.monitor .scopehead{font-size:9px;padding:7px}.monitor .scopehead .unit{font-size:8px}.monitor .band-summary{font-size:9px;padding:3px 8px}.monitor .xaxis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:8px}.monitor .probe{display:none}.monitor #analysis{display:none}.monitor .scopeplot{padding:8px 8px 8px 38px}.monitor .ticks{top:8px;bottom:8px;left:5px;font-size:8px}</style><style>
+/* Keep corresponding vector axes aligned even when titles and counts differ. */
+#scopes.split-layout .scopehead{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;align-content:start}
+#scopes.split-layout .scopehead>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scopes.split-layout .band-summary{display:grid;grid-template-rows:14px 14px;line-height:14px}
+#scopes.split-layout .band-summary>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<style>#scopes .scope.top-row .scopehead,#scopes .scope.top-row .band-summary{text-align:center}</style>
+
+<style>
+body.scopes-page{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.scopes-page header{flex:none;width:100%}
+.scopes-page main{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;padding:16px}
+.scopes-page #scopeview{flex:1;min-height:0;display:flex;flex-direction:column}
+.scopes-page #scopeview[hidden]{display:none!important}
+.scopes-page #scopes{flex:1;min-height:0;gap:12px}
+.scopes-page #scopes .scope{min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.scopes-page #scopes .scopeplot{height:auto!important;min-height:0;flex:1}
+.scopes-page #panel{overflow:auto;min-height:0;margin-bottom:0}
+.scopes-page .toolbar{flex:none;margin-bottom:12px}
+.scopes-page .metrics{flex:none}
+.scopes-page .scopehead,.scopes-page .band-summary,.scopes-page .xaxis,.scopes-page .probe{flex:none}
+.scopes-page .scopeplot canvas{margin:auto}
+#layoutshare{max-width:none}
+</style>
+
+<style>.layout-preview #qa-palette{display:none!important}#layoutsharelabel[hidden]{display:none!important}</style>
+<style>
+.scopes-page #scopes .scopehead{padding:6px 8px;gap:2px}
+.debug-off .scopes-page #scopes .band-summary{grid-template-rows:14px;padding:3px 8px}
+.scopes-page #scopes .xaxis{padding:0 4px 4px;font-size:9px;line-height:1.2}
+.scopes-page #scopes .scopeplot{padding:6px 6px 6px 32px}
+.scopes-page #scopes .ticks{top:6px;bottom:6px;left:4px}
+</style>
+<style>
+/* Keep the single live status line visible above fullscreen scopes. */
+body.monitor header{display:flex!important;padding:5px 16px;border:0;min-height:24px;flex:none}
+body.monitor header h1,body.monitor header p,body.monitor header #fullscreen{display:none!important}
+body.monitor header>div{width:100%}
+body.monitor header .heading-line{gap:0;justify-content:center}
+body.monitor header #connection{font-size:11px;line-height:14px}
+body.scopes-page.monitor main{height:auto;padding-top:4px}
+</style>
+
+<style>.histogram-ranges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}.histogram-ranges span{text-align:center}</style>
+
+<style>
+#fullscreenmagnify{display:none}
+body.monitor header{position:relative;min-height:42px}
+body.monitor #fullscreenmagnify{display:block;position:absolute;right:16px;top:50%;transform:translateY(-50%);min-width:44px;min-height:32px;padding:4px 8px;font-size:12px}
+</style>
+
+<style>
+#fullscreencontrols{display:none}
+body.monitor header{flex-direction:column;gap:6px;padding:6px 16px;min-height:0}
+body.monitor #fullscreencontrols{display:flex;width:auto;max-width:100%;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
+body.monitor #fullscreenmagnify{position:static;transform:none}
+#fullscreencontrols label{display:flex;align-items:center;gap:6px;flex:none;font-size:11px}
+#fullscreencontrols input{width:110px;max-width:110px;padding:0;min-height:28px}
+#fullscreencontrols output{min-width:38px;text-align:right}
+#fullscreensmooth{padding:5px 9px;min-height:32px;font-size:11px}
+#fullscreensmooth[aria-pressed="true"]{border-color:#bbb;color:#fff;background:#242424}
+</style>
+
+<style>
+body.scopes-page .view-tabs{display:none}
+body.scopes-page:not(.monitor) header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 18px}
+body.scopes-page:not(.monitor) header>div:first-child{grid-column:1;grid-row:1;min-width:0}
+body.scopes-page:not(.monitor) header>#fullscreen{grid-column:2;grid-row:1;margin-left:0}
+body.scopes-page #fullscreencontrols{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:10px;overflow-x:auto;max-width:100%;min-width:0}
+body.scopes-page:not(.monitor) #fullscreencontrols{grid-column:1/-1;grid-row:2}
+body.scopes-page #fullscreencontrols>*{flex-shrink:0}
+body.scopes-page #fullscreenmagnify{display:block;min-width:44px;min-height:32px;padding:4px 8px;font-size:12px}
+body.scopes-page #magnify{display:none}
+</style>
+
+<style>body.scopes-page .toolbar{display:none}#fullscreencontrols #start{min-height:34px;padding:6px 10px;font-size:12px}</style>
+
+<style>
+.scopeplot{touch-action:none}
+.scopeplot.scope-zoomed{overflow:hidden}
+.scope-zoom-reset{flex:none;padding:3px 6px;font-size:10px;min-height:28px;background:#171717;color:#ccc;border:1px solid #444;letter-spacing:0}
+.scope-zoom-reset[hidden]{display:none!important}
+</style>
+
+<style>.scope{position:relative}.scope-zoom-reset{position:absolute;right:4px;top:4px;z-index:5}</style>
+<style>.scope[data-scope="13"] .scopehead{position:relative;padding-right:115px!important}.scope[data-scope="13"] .scopehead>button{position:absolute;right:8px;top:8px;width:auto;min-width:0;padding:5px 10px;font-size:11px}.scope[data-scope="13"] .scopeplot{padding:10px 15px 15px}.scope[data-scope="13"] canvas{cursor:grab}.scope[data-scope="13"] canvas:active{cursor:grabbing}</style>
+
+<style>body.monitor{overscroll-behavior:none}body.monitor #scopes{overscroll-behavior:contain}.scope[data-scope="13"] .scopeplot,.scope[data-scope="13"] canvas{touch-action:none;overscroll-behavior:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}</style>
+
+<style>
+#controlhandle{display:none}
+body.scopes-page.monitor header{height:46px;min-height:46px;padding:4px 16px;box-sizing:border-box;z-index:20}
+body.scopes-page.monitor #controlhandle{display:block;position:absolute;top:22px;left:50%;transform:translateX(-50%);width:70px;min-height:22px;padding:2px 8px;border:0;border-radius:0 0 8px 8px;background:#1b1b1b;color:#777;font-size:10px;line-height:16px}
+body.scopes-page.monitor #controlhandle:hover,body.scopes-page.monitor #controlhandle:focus-visible{color:#ddd;background:#303030}
+body.scopes-page.monitor #fullscreencontrols{position:fixed;top:48px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 28px);margin:0;padding:8px 12px;box-sizing:border-box;background:#181818f2;border:1px solid #3a3a3a;border-radius:8px;box-shadow:0 5px 20px #0008;z-index:30;opacity:1;visibility:visible;transition:opacity 180ms ease,visibility 180ms}
+body.scopes-page.monitor.controls-tucked #fullscreencontrols{opacity:0;visibility:hidden;pointer-events:none}
+@media(prefers-reduced-motion:reduce){body.scopes-page.monitor #fullscreencontrols{transition:none}}
+</style>
+
+<style>
+/* The card is the sole vector clipping boundary. The trace may fill its width;
+   guides and text keep their original size and position. */
+.scope[data-scope="3"],.scope[data-scope="4"],.scope[data-scope="5"],.scope[data-scope="6"]{overflow:hidden}
+.scope[data-scope="3"] .scopeplot,.scope[data-scope="4"] .scopeplot,.scope[data-scope="5"] .scopeplot,.scope[data-scope="6"] .scopeplot{overflow:visible!important}
+</style>
+
+<style>.scope .scopehead,.scope .band-summary,.scope .xaxis{position:relative;z-index:2}.scope .ticks{z-index:2}</style>
+
+<style>
+/* Tabs stay available independently of the fading grading controls. */
+body.scopes-page header>.view-tabs{display:flex;justify-content:center;gap:24px;margin:0;border:0;width:auto}
+body.scopes-page:not(.monitor) header>.view-tabs{grid-column:1/-1;grid-row:2}
+body.scopes-page:not(.monitor) #fullscreencontrols{grid-row:3}
+body.scopes-page.monitor header>.view-tabs{position:absolute;top:22px;left:50%;transform:translateX(-50%);gap:100px;z-index:21}
+body.scopes-page.monitor header>.view-tabs [role="tab"]{padding:1px 8px;min-height:22px;font-size:11px;line-height:18px}
+body.scopes-page.monitor #controlhandle{z-index:22}
+</style>
+
+<style>
+/* A persistent tab row and explicit popup handle in both viewing modes. */
+body.scopes-page:not(.monitor) header{position:relative}
+body.scopes-page:not(.monitor) header>.view-tabs{gap:100px}
+body.scopes-page #controlhandle{display:block;position:absolute;left:50%;transform:translateX(-50%);width:70px;min-height:22px;padding:2px 8px;border:0;border-radius:8px 8px 0 0;background:#1b1b1b;color:#999;font-size:10px;line-height:16px;z-index:22}
+body.scopes-page:not(.monitor) #controlhandle{bottom:18px}
+body.scopes-page #fullscreencontrols{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 28px);margin:0;padding:8px 12px;box-sizing:border-box;background:#181818f2;border:1px solid #3a3a3a;border-radius:8px;box-shadow:0 5px 20px #0008;z-index:30;opacity:1;visibility:visible;transition:opacity 180ms ease,visibility 180ms}
+body.scopes-page.controls-tucked #fullscreencontrols{opacity:0;visibility:hidden;pointer-events:none}
+body.scopes-page.monitor #controlhandle{border-radius:8px 8px 0 0}
+@media(prefers-reduced-motion:reduce){body.scopes-page #fullscreencontrols{transition:none}}
+</style>
+
+<style>
+/* The persistent navigation and disclosure share one baseline in either view. */
+body.scopes-page:not(.monitor) header>.view-tabs{height:36px;align-items:center}
+body.scopes-page:not(.monitor) header>.view-tabs [role="tab"]{box-sizing:border-box;padding:6px 2px;min-height:36px;line-height:22px}
+body.scopes-page:not(.monitor) #controlhandle{bottom:25px;height:22px;min-height:22px;box-sizing:border-box;line-height:18px;padding:2px 8px}
+body.scopes-page.monitor header>.view-tabs{height:22px;align-items:center}
+body.scopes-page.monitor header>.view-tabs [role="tab"]{box-sizing:border-box;height:22px;min-height:22px;padding:1px 8px;line-height:18px}
+body.scopes-page.monitor #controlhandle{height:22px;min-height:22px;box-sizing:border-box;line-height:18px;padding:2px 8px}
+</style>
+
+<style>
+/* One compact navigation line on the main view. */
+body.scopes-page:not(.monitor) header{display:flex;align-items:center;gap:20px;padding:18px 24px;flex-wrap:nowrap}
+body.scopes-page:not(.monitor) header>div:first-child{display:contents}
+body.scopes-page:not(.monitor) .heading-line{display:contents}
+body.scopes-page:not(.monitor) header h1{order:0;white-space:nowrap;margin:0}
+body.scopes-page:not(.monitor) header>.view-tabs{order:1;flex:none;gap:100px;height:36px}
+body.scopes-page:not(.monitor) #connection{order:2;margin-left:auto;white-space:normal}
+body.scopes-page:not(.monitor) header>#fullscreen{order:3;flex:none;margin:0}
+body.scopes-page:not(.monitor) header>div:first-child>p{display:none}
+body.scopes-page:not(.monitor) #controlhandle{top:50%;bottom:auto;left:var(--control-center,50%);transform:translate(-50%,-50%)}
+body.scopes-page:not(.monitor) #fullscreencontrols{top:100%}
+@media(max-width:1050px){body.scopes-page:not(.monitor) header{gap:12px;padding:12px}body.scopes-page:not(.monitor) header h1{font-size:16px}body.scopes-page:not(.monitor) #connection{font-size:10px}body.scopes-page:not(.monitor) header>.view-tabs{gap:82px}}
+</style>
+
+<style>body.scopes-page.monitor header .heading-line{justify-content:flex-end}body.scopes-page.monitor header #connection{margin-left:auto;text-align:right}</style>
+
+<style>body.scopes-page.monitor header #connection{position:absolute;right:16px;top:33px;transform:translateY(-50%);margin:0;line-height:14px;text-align:right}</style>
+
+<style>
+.scope .scopehead{position:relative;cursor:pointer;padding-right:28px!important}
+.scope .scopehead::after{content:'⌄';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#777;font-size:13px;pointer-events:none}
+.scope .scope-type{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:3}
+.scope .scopehead:focus-within{outline:1px solid #999;outline-offset:-2px}
+.scope[data-scope="13"] .scopehead{padding-right:115px!important}
+.scope[data-scope="13"] .scope-type{width:calc(100% - 115px)}
+.scope[data-scope="13"] .scopehead::after{right:122px}
+.scope[data-scope="13"] .scopehead>button{z-index:4}
+</style>
+
+<style>/* Vector surfaces occupy the complete plot, independently of chroma geometry. */
+.scope[data-scope="3"] canvas,.scope[data-scope="4"] canvas,.scope[data-scope="5"] canvas,.scope[data-scope="6"] canvas{width:100%;height:100%;max-width:none;aspect-ratio:auto;margin:0}
+</style>
+<style>.visual-test #scopes:not(.split-layout) .scopeplot{height:180px}</style>
+
+<style>#roistatus{flex-basis:100%}.roi-controls #roimap{margin-right:auto}</style>
+<style>.snapshot-buttons{display:flex;gap:4px;align-items:center;position:relative;z-index:5;justify-content:center;cursor:default;grid-column:1 / -1}.snapshot-buttons button{width:auto;min-width:0;margin:0;font-size:10px;padding:3px 6px;min-height:26px;letter-spacing:0}.snapshot-buttons .snapshot-number{width:26px;height:26px;padding:0;border:1px solid var(--snapshot-colour);color:var(--snapshot-colour);background:#161616}.snapshot-number[aria-pressed="true"]{background:color-mix(in srgb,var(--snapshot-colour) 30%,#111);box-shadow:inset 0 0 0 1px var(--snapshot-colour)}.snapshot-number.snapshot-incompatible{border-style:dashed;opacity:.5}.snapshot-buttons [hidden]{display:none!important}.scopeplot canvas.snapshot-overlay{position:absolute;pointer-events:none;margin:0;z-index:1;mix-blend-mode:screen;max-width:none}.scopeplot canvas.snapshot-overlay[hidden]{display:none}.visual-test:not(.snapshot-qa) .snapshot-buttons{display:none}</style><style>#scopes.is-empty{display:none!important}#emptyscopes{flex:1;min-height:240px;display:grid;align-content:center;justify-items:center;gap:16px;color:#888}#emptyscopes[hidden]{display:none!important}#emptylayoutdialog{background:#191919;color:#ddd;border:1px solid #444;border-radius:8px;padding:24px;width:min(480px,calc(100vw - 32px));max-height:85dvh;overflow:auto}#emptylayoutdialog::backdrop{background:#0009}#emptylayoutdialog h2{font-size:18px;margin:0 0 20px}#emptylayoutdialog label{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-size:12px;color:#aaa}#emptylayoutdialog select{width:100%;max-width:none}#emptylayoutslots{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.emptylayout-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}#emptylayouterror{font-size:12px;color:#d98080}@media(max-width:450px){#emptylayoutslots{grid-template-columns:1fr}}</style><style>#addscopebar{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;flex:none;margin:0 0 8px}#addscopebar[hidden]{display:none!important}.add-scope-slot{display:flex;gap:8px;align-items:center;padding:4px 8px;border:1px solid #333;border-radius:4px;font-size:11px;color:#888}.add-scope-slot select{width:auto;max-width:190px;padding:4px 6px;font-size:12px;background:#191919}.scope{container-type:inline-size}#scopes .scope .scopehead{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:6px;padding:6px 26px 6px 8px!important;min-height:34px}#scopes .scope .scopehead>span:first-child{flex:1 1 auto;width:auto!important;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#scopes .scope .scopehead .unit{flex:0 1 28%;width:auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#scopes .scope .scopehead .snapshot-buttons{flex:0 1 auto;max-width:calc(100% - 55px);overflow-x:auto;white-space:nowrap;justify-content:flex-start;scrollbar-width:thin;gap:3px}#scopes .snapshot-buttons button{flex:none;padding:3px 5px;min-height:24px}#scopes .snapshot-buttons .snapshot-number{width:24px;height:24px}#scopes .scope .scopehead>button{position:relative!important;inset:auto!important;flex:none;z-index:5;margin:0;padding:3px 5px;font-size:10px;min-height:24px}#scopes .scope[data-scope="13"] .scope-type{width:100%}#scopes .scope[data-scope="13"] .scopehead::after{right:10px}@container (max-width:560px){#scopes .scope .scopehead .unit{display:none}}</style><style>.add-scope-slot[hidden]{display:none!important}</style><style>#addscopebar .add-scope-slot{width:auto;max-width:100%;flex:0 0 auto}</style><style>#addscopebar .add-scope-slot{min-width:0}</style>

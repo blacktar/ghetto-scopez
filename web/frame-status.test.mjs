@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {resolveFrameStatus} from './public/frame-status.mjs';
+test('still frames remain valid indefinitely and fresh grade renders restore live status',()=>{for(const ms of [0,100,500,1200,2000])assert.equal(resolveFrameStatus(ms),'Receiving data from Resolve');for(const ms of [2500,12000,3600000,86400000])assert.equal(resolveFrameStatus(ms),'Still frame · scopes retained');assert.equal(resolveFrameStatus(0),'Receiving data from Resolve');});

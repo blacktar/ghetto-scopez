@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {initialView,zoomView,panView,pinchView} from './public/scope-zoom.mjs';
+const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-12,`${a} != ${b}`);
+test('local zoom preserves the hovered signal coordinate and leaves other scopes unchanged',()=>{const a=initialView(),b=initialView(),anchor={x:.3,y:.7},next=zoomView(a,4,anchor);near((anchor.x-next.x)/next.scale,anchor.x);near((anchor.y-next.y)/next.scale,anchor.y);assert.deepEqual(a,initialView());assert.deepEqual(b,initialView());assert.deepEqual(zoomView(next,1,anchor),initialView());});
+test('pinch follows midpoint translation, caps resources and avoids panning off the image',()=>{const a=pinchView(initialView(),{x:.5,y:.5},{x:.6,y:.4},2);near(a.scale,2);near(a.x,-.4);near(a.y,-.6);const max=zoomView(a,100,{x:.5,y:.5});assert.equal(max.scale,8);assert.deepEqual(panView(max,{x:100,y:-100}),{scale:8,x:0,y:-7});});
+
+test('origin-anchored zoom keeps the neutral point fixed across successive zoom steps',()=>{let view=initialView();for(const scale of [1.2,2,4,8,3,1]){view=zoomView(view,scale,{x:.5,y:.5});near(.5*view.scale+view.x,.5);near(.5*view.scale+view.y,.5);}});
+test('global magnification expands only the trace around its fixed origin',async()=>{const {displayView}=await import('./public/scope-zoom.mjs');for(const g of [1,2,3,4]){const d=displayView(initialView(),g);near(.5*d.scale+d.x,.5);near(.5*d.scale+d.y,.5);near(d.scale,g);}assert.deepEqual(initialView(),{scale:1,x:0,y:0});});

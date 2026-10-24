@@ -1,0 +1,2 @@
+import {readFileSync} from 'node:fs';import assert from 'node:assert/strict';import {decodeInput} from './resolve-input.mjs';
+const b=readFileSync(process.argv[2]),f=decodeInput(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength));assert.equal(f.capture.sequence,42);assert.equal(f.capture.instanceId,'native-core-test');assert.deepEqual([...new Uint32Array(f.data.buffer,f.data.byteOffset,f.data.length)],[0x80000000,0x7fc01234,0x3f800000]);console.log('PASS native C++ RIF1 packet → JavaScript checksum / provenance / exact float bits');
