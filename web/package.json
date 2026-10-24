@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.mjs",
     "pretest": "bash ../scripts/build-analysis.sh",
-    "test": "node --test snapshots.test.mjs colour-analysis.test.mjs wave-colour-codec.test.mjs waveform.test.mjs production-mode.test.mjs test.mjs scopes.test.mjs scope-wire.test.mjs signal.test.mjs roi.test.mjs split.test.mjs resolve.test.mjs native-analysis.test.mjs layout.test.mjs quality.test.mjs software-renderer.test.mjs tap-info.test.mjs scope-zoom.test.mjs cube.test.mjs plot-gestures.test.mjs control-dock.test.mjs frame-status.test.mjs local-ingest.test.mjs metal-input.test.mjs keep-awake.test.mjs analysis-lanes.test.mjs"
+    "test": "node --test working-space.test.mjs snapshots.test.mjs colour-analysis.test.mjs wave-colour-codec.test.mjs waveform.test.mjs production-mode.test.mjs test.mjs scopes.test.mjs scope-wire.test.mjs signal.test.mjs roi.test.mjs split.test.mjs resolve.test.mjs native-analysis.test.mjs layout.test.mjs quality.test.mjs software-renderer.test.mjs tap-info.test.mjs scope-zoom.test.mjs cube.test.mjs plot-gestures.test.mjs control-dock.test.mjs frame-status.test.mjs local-ingest.test.mjs metal-input.test.mjs keep-awake.test.mjs analysis-lanes.test.mjs"
   },
   "dependencies": {
     "nosleep.js": "0.12.0",

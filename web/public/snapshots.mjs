@@ -3,7 +3,7 @@ export const SNAPSHOT_COLOURS=['#d97979','#80b88c','#799bd4'];
 export function snapshotFields(scope){return scope===0?['wave','waveColour']:scope===1?['parade']:scope===3?['vector']:scope>=4&&scope<=6?[['low','mid','high'][scope-4]]:scope===7?['twin']:scope===13?['cube']:scope===14?['satlum']:scope===15?['hue']:['hist'];}
 export function snapshotBytes(data,scope){return snapshotFields(scope).reduce((n,k)=>n+(data[k]?.byteLength??0),0);}
 export function captureSnapshot(data,scope){const out={config:structuredClone(data.config),measurement:structuredClone(data.measurement),source:structuredClone(data.source),cubeStats:structuredClone(data.cubeStats),waveColourEncoding:data.waveColourEncoding,samples:data.samples,kind:data.kind};for(const k of snapshotFields(scope))if(data[k])out[k]=data[k].slice();return {version:1,scope,capturedAt:new Date().toISOString(),enabled:true,data:out};}
-export function snapshotCompatibility(a,b){const key=d=>JSON.stringify([d.config.min,d.config.max,d.measurement.matrix,d.source.signal.model,d.source.signal.range,d.source.signal.primaries,d.source.signal.transfer]);return key(a)===key(b);}
+export function snapshotCompatibility(a,b){const key=d=>JSON.stringify([d.config.min,d.config.max,d.measurement.matrix,d.source.signal.model,d.source.signal.range,d.source.signal.primaries,d.source.signal.transfer,d.source.signal.domain??'encoded']);return key(a)===key(b);}
 export class SnapshotBank{
  constructor(){this.scopes=new Map();this.next=new Map();}
  get bytes(){let n=0;for(const [scope,slots]of this.scopes)for(const s of slots)n+=snapshotBytes(s.data,scope);return n;}

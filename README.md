@@ -7,7 +7,7 @@ Made by **Vidar Andersen**. [Read the user guide](https://vidarandersen.com/dmz/
 
 ## Install and start
 
-This release includes **GTap 1.2.23** and **viewer 0.2.51**.
+This release includes **GTap 1.2.24** and **viewer 0.2.52**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
 DaVinci Resolve is required. The installer automatically installs the official
@@ -20,9 +20,10 @@ command line tools or manual setup commands are needed.
    and continues automatically.
 3. Enter your Mac administrator password when requested. Setup installs the host
    requirements and GTap, then starts the host and opens the HTML guide.
-4. Reopen Resolve, add GTap after the display/output transform you want to measure,
-   and choose the matching input declaration. Open the address in its panel on
-   another device, then select **Start listening** or **Fullscreen**.
+4. Open Resolve and add GTap at the point you want to measure. Choose
+   **Source / working-space RGB — no transform** for raw values, or place GTap
+   after your display/output transform and choose matching encoded RGB. Open
+   its panel’s address on another device, then select **Start listening** or **Fullscreen**.
 
 For subsequent sessions, double-click **Start.command**. Keep its Terminal window
 open while using the scopes. Control-C stops the host.
@@ -42,6 +43,12 @@ a rotatable RGB cube, saturation/luma and hue histogram; image region and colour
 selection; three A/B/C snapshots per scope; saved browser settings and settings
 files. The guide works offline and on portrait phones. Its full-width header
 randomly selects one of 34 supplied images, converted to responsive WebP assets.
+
+Source / working-space tap: choose **Source / working-space RGB — no transform**
+in GTap Input to measure raw float32 RGB at that node. RGB is unchanged; negative
+and above-one values are retained. Weighted RGB and difference views use an
+explicit fixed BT.709 analysis basis, without inferring project primaries or
+transfer. Display targets are hidden and axes use raw float values.
 
 The host is intended for a trusted local network. No account is required.
 Update speed varies by image and device; source-coloured waveforms remain demanding.

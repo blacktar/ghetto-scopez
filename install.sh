@@ -6,7 +6,7 @@ fail(){ printf '\nInstallation stopped: %s\n' "$*" >&2; exit 1; }
 [[ "$(uname -s)" == Darwin ]] || fail 'This release requires macOS.'
 [[ "${1:-}" == '' || "${1:-}" == '--check' ]] || fail 'Usage: bash install.sh [--check]'
 [[ "$(sw_vers -productVersion | cut -d. -f1)" -ge 27 ]] || fail 'The included GTap binary requires macOS 27 or later.'
-for payload in release/GTap-v1.2.23.ofx.bundle.zip release/scope-analysis.node; do
+for payload in release/GTap-v1.2.24.ofx.bundle.zip release/scope-analysis.node; do
  [[ -f "$payload" ]] || fail 'Download and unzip the complete Mac release package.'
 done
 shasum -a 256 -c release/SHA256SUMS || fail 'Release checksum mismatch. Download a fresh package.'
@@ -49,7 +49,7 @@ if [[ -e "$target" ]]; then
  identity="$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$target/Contents/Info.plist")"
  [[ "$identity" == local.signallab.ResolveTap ]] || fail 'A different plugin is present at the installation path.'
 fi
-ditto -x -k release/GTap-v1.2.23.ofx.bundle.zip "$staging"
+ditto -x -k release/GTap-v1.2.24.ofx.bundle.zip "$staging"
 codesign --verify --deep --strict "$staging/SignalLabTap.ofx.bundle"
 sudo /bin/mkdir -p /Library/OFX/Plugins
 pgrep -x Resolve >/dev/null && fail 'Resolve reopened during setup. Close it and run Install again.'
