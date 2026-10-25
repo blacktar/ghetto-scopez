@@ -4,7 +4,9 @@ Current viewer: **0.2.52**; release effect: **GTap 1.2.24**.
 
 Use [README.md](README.md) for installation or
 [the HTML guide](web/public/guide/index.html) for everyday use.
-Run `bash start.sh`; open the address from GTap's panel on a device on the same LAN.
+For the new `.pkg` installation, use **GS** in the menu bar to start/stop the
+server and open the viewer. It starts automatically at login. Source checkouts
+can still run `bash start.sh`. Open GTap’s address on a device on the same LAN.
 The guide is also at `/guide/index.html` on the host, linked from Settings.
 
 The host uses Node.js and a Node-API native analysis component, with the Resolve

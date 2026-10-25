@@ -10,31 +10,22 @@ Made by **Vidar Andersen**. [Read the user guide](https://vidarandersen.com/dmz/
 This release includes **GTap 1.2.24** and **viewer 0.2.52**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
-DaVinci Resolve is required. The installer automatically installs the official
-Apple-signed Node.js package if a compatible Node.js version is not already present.
-The release includes the compiled host component and browser dependencies; no
-command line tools or manual setup commands are needed.
+DaVinci Resolve is required. The new `.pkg` installer bundles the server,
+Node.js runtime, browser dependencies and prebuilt GTap; no developer tools or
+separate runtime installation are required.
 
-1. Download and unzip the complete Mac release ZIP.
-2. Double-click **Install.command**. Quit Resolve if the installer asks; it waits
-   and continues automatically.
-3. Enter your Mac administrator password when requested. Setup installs the host
-   requirements and GTap, then starts the host and opens the HTML guide.
-4. Open Resolve and add GTap at the point you want to measure. Choose
-   **Source / working-space RGB — no transform** for raw values, or place GTap
-   after your display/output transform and choose matching encoded RGB. Open
-   its panel’s address on another device, then select **Start listening** or **Fullscreen**.
+1. Quit Resolve and stop any older Ghetto Scopez host.
+2. Open the Mac `.pkg` installer and enter your administrator password when asked.
+3. Double-click the desktop **Ghetto Scopez** alias to start the app or open its
+   server controls. Use **GS** in the menu bar to open the viewer or guide, start/stop the server,
+   show its log or quit. The server starts after installation and at login.
+4. Open Resolve, add GTap at the measurement point and choose the matching input.
+   Open its panel’s network address on the other display.
 
-For subsequent sessions, double-click **Start.command**. Keep its Terminal window
-open while using the scopes. Control-C stops the host.
-
-Node.js is downloaded from nodejs.org only when needed; the installer verifies its
-pinned SHA-256 checksum and Apple Developer ID signature before installing it.
-`bash install.sh --check` performs a read-only release preflight.
-GTap is currently locally signed. Apple notarization is pending Apple’s reactivation
-of the dormant Apple Developer ID. macOS may require permission to open downloaded
-commands in Privacy & Security. The installer does not bypass macOS security controls
-or launch/quit Resolve for you.
+Open **Ghetto Scopez** from Applications to reopen the menu-bar app after quitting.
+The installer is Developer ID signed and Apple-notarised. Full fresh/upgrade
+installation and login-startup testing remain pending. The earlier
+ZIP/Install.command package is retained as a legacy download.
 
 ## What is included
 
