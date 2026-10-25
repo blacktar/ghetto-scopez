@@ -28,5 +28,5 @@ user optical approval before guide diff packaging or publication.
 Verified locally: both architectures compile; bundled Node/native host works on
 Apple Silicon on an isolated port; Finder alias resolves; signed package accepted
 by Apple, ticket stapled/validated, Gatekeeper install assessment accepted.
-Pending: actual fresh/upgrade installation, postinstall Desktop access/login
-startup, menu lifecycle and Resolve ingestion; execution on an Intel Mac.
+Installation confirmed working by the user on 2026-10-25. This confirmation
+does not separately establish upgrade, subsequent-login or Intel-hardware coverage.

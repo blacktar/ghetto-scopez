@@ -23,9 +23,9 @@ separate runtime installation are required.
    Open its panel’s network address on the other display.
 
 Open **Ghetto Scopez** from Applications to reopen the menu-bar app after quitting.
-The installer is Developer ID signed and Apple-notarised. Full fresh/upgrade
-installation and login-startup testing remain pending. The earlier
-ZIP/Install.command package is retained as a legacy download.
+The installer is Developer ID signed and Apple-notarised. Installation has been
+confirmed working by the user. The earlier ZIP/Install.command package is
+retained as a legacy download.
 
 ## What is included
 
