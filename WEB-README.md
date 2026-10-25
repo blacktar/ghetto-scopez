@@ -16,3 +16,6 @@ in GTap Input to measure raw float32 RGB at that node. RGB is unchanged; negativ
 and above-one values are retained. Weighted RGB and difference views use an
 explicit fixed BT.709 analysis basis, without inferring project primaries or
 transfer. Display targets are hidden and axes use raw float values.
+
+The user guide includes a Lens Debaser teaser and optional tawk.to support chat,
+loaded after the guide finishes loading. The guide remains readable offline.
