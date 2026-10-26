@@ -35,10 +35,10 @@ static napi_value run(napi_env e,napi_callback_info info){try{
  size_t argc=5;napi_value a[5];check(napi_get_cb_info(e,info,&argc,a,nullptr,nullptr));if(argc!=5)throw std::runtime_error("Native analysis requires five arguments");
  size_t count;auto data=(float*)typed(e,a[0],napi_float32_array,count);auto c=a[1],m=a[2],planes=a[3],result=a[4];
  int width=number(e,c,"sourceWidth"),height=number(e,c,"sourceHeight"),x0=number(e,c,"x0"),x1=number(e,c,"x1"),y0=number(e,c,"y0"),y1=number(e,c,"y1");
- int mask=number(e,c,"planeMask");int levels=number(e,c,"levels"),ww=number(e,c,"waveWidth"),vs=number(e,c,"vectorSize"),tw=number(e,c,"twinWidth"),th=number(e,c,"twinHeight");
+ int mask=number(e,c,"planeMask");int hb=number(e,c,"histBins"),levels=number(e,c,"levels"),ww=number(e,c,"waveWidth"),vs=number(e,c,"vectorSize"),tw=number(e,c,"twinWidth"),th=number(e,c,"twinHeight");
  double mn=number(e,c,"min"),mx=number(e,c,"max"),zoom=number(e,c,"vectorZoom"),txb=number(e,c,"twinX"),tyb=number(e,c,"twinY"),lc=number(e,c,"lowCut"),hc=number(e,c,"highCut"),kr=number(e,m,"kr"),kg=number(e,m,"kg"),kb=number(e,m,"kb");
- if(width<1||height<1||uint64_t(width)*height>16777216||count!=size_t(width)*height*3||x0<0||x1>width||y0<0||y1>height||x0>=x1||y0>=y1||levels<2||levels>4096||ww!=512||(vs!=512&&vs!=1024&&vs!=1536&&vs!=2048)||tw!=512||th!=1024||!(mx>mn)||!(zoom>0)||!(txb>0)||!(tyb>0))throw std::runtime_error("Invalid native dimensions/configuration");
- const char*names[]={"wave","parade","hist","vector","low","mid","high","twin"};size_t sizes[]={size_t(ww)*levels,size_t(ww)*levels*3,size_t(levels)*3,size_t(vs)*vs,size_t(vs)*vs,size_t(vs)*vs,size_t(vs)*vs,size_t(tw)*th};Plane p[8];
+ if(width<1||height<1||uint64_t(width)*height>16777216||count!=size_t(width)*height*3||x0<0||x1>width||y0<0||y1>height||x0>=x1||y0>=y1||levels<2||levels>4096||(ww<512||ww>2048||ww%512)||(vs!=512&&vs!=1024&&vs!=1536&&vs!=2048)||(tw<512||tw>2048||tw%512)||th!=tw*2||!(mx>mn)||!(zoom>0)||!(txb>0)||!(tyb>0))throw std::runtime_error("Invalid native dimensions/configuration");
+ const char*names[]={"wave","parade","hist","vector","low","mid","high","twin"};size_t sizes[]={size_t(ww)*levels,size_t(ww)*levels*3,size_t(hb)*3,size_t(vs)*vs,size_t(vs)*vs,size_t(vs)*vs,size_t(vs)*vs,size_t(tw)*th};Plane p[8];
  for(int j=0;j<8;j++){p[j].p=(uint32_t*)typed(e,prop(e,planes,names[j]),napi_uint32_array,p[j].n);if(p[j].n!=sizes[j])throw std::runtime_error("Invalid native plane dimensions");}
  Stats stats[4],raw[3];Pair pairs[2];uint32_t bp[3]={},bo[3]={},bn[3]={},outside=0;double half=.5/zoom;
  const int numberMask=mask;
@@ -97,7 +97,7 @@ static napi_value run(napi_env e,napi_callback_info info){try{
 #if defined(__aarch64__)
  if constexpr(decltype(tag)::value!=240)
 #endif
- stats[ch].add(v,mn,mx);if(!std::isfinite(v)||v<mn||v>mx||!(mask&(ch==3?1:6)))continue;int bin=int(roundBin((v-mn)/(mx-mn)*(levels-1)));if(ch==3&&(mask&1))p[0].add(size_t(bin)*ww+xx);else if(ch<3){if(mask&2)p[1].add((size_t(ch)*levels+bin)*ww+xx);if(mask&4)p[2].add(ch*levels+bin);}}
+ stats[ch].add(v,mn,mx);if(!std::isfinite(v)||v<mn||v>mx||!(mask&(ch==3?1:6)))continue;int bin=int(roundBin((v-mn)/(mx-mn)*(levels-1)));if(ch==3&&(mask&1))p[0].add(size_t(bin)*ww+xx);else if(ch<3){if(mask&2)p[1].add((size_t(ch)*levels+bin)*ww+xx);if(mask&4)p[2].add(ch*hb+int(roundBin((v-mn)/(mx-mn)*(hb-1))));}}
   if(std::isfinite(r)&&std::isfinite(g)&&std::isfinite(b)){double u,v;
 #if defined(__aarch64__)
  if constexpr(decltype(tag)::value==240){u=derived[size_t(x1-x0)+sx-x0];v=derived[size_t(2)*(x1-x0)+sx-x0];}else

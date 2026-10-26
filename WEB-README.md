@@ -1,6 +1,6 @@
 # Browser viewer
 
-Current viewer: **0.2.52**; release effect: **GTap 1.2.24**.
+Current viewer: **0.2.54**; release effect: **GTap 1.2.26**.
 
 Use [README.md](README.md) for installation or
 [the HTML guide](web/public/guide/index.html) for everyday use.
@@ -21,3 +21,5 @@ transfer. Display targets are hidden and axes use raw float values.
 
 The user guide includes a Lens Debaser teaser and optional tawk.to support chat,
 loaded after the guide finishes loading. The guide remains readable offline.
+
+Zoom (1×–4×) and Detail Level (Q1–Q4) are independent. Q controls underlying detail in all scope types; Smooth now applies to every plot using spatial, value-axis, circular-hue or soft-point filtering as appropriate. DoubleD always retains its aspect ratio. The expanded grids require GTap 1.2.25 and the updated host.

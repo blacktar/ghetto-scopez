@@ -1,0 +1,11 @@
+OG celebration music — Monday
+-----------------------------
+Monday by Edvin Fladen, aka Random Voice, April 1991.
+Original module: web/public/assets/random-voice-monday.mod
+Browser playback: web/public/assets/random-voice-monday.m4a
+Original module rendered to stereo AAC for local browser playback; composition
+unchanged. Copyright remains with Edvin Fladen / Random Voice.
+Included with the project owner's confirmation of the composer's permission
+(2026-10-26); not relicensed under the project's CC BY-NC-SA 4.0 licence.
+Source record: https://modarchive.org/index.php?query=164407&request=view_by_moduleid
+Downloaded from: https://modland.com/pub/modules/Protracker/Random%20Voice/monday.mod

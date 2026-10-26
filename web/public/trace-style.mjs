@@ -22,3 +22,8 @@ float traceIntensity(usampler2D tex){
  }
  return clamp(log(1.+d*traceGain)*.25*traceBrightness,0.,1.);
 }`;
+
+// Display-only 1D smoothing; each channel is isolated, hue wraps around.
+export function smoothHistogram(values,bins,channels=1,wrap=false){const out=new Float64Array(values.length);for(let ch=0;ch<channels;ch++)for(let x=0;x<bins;x++){let sum=0;for(let k=-3;k<=3;k++){const at=wrap?(x+k+bins)%bins:Math.max(0,Math.min(bins-1,x+k));sum+=values[ch*bins+at]*SMOOTH_KERNEL[k+3]/64;}out[ch*bins+x]=.25*values[ch*bins+x]+.75*sum;}return out;}
+// Separable Canvas filtering works in Safari without Canvas filter support.
+export function createTraceFilter(){const base=document.createElement('canvas'),pass=document.createElement('canvas'),out=document.createElement('canvas');return {draw(source,context,width,height,groups=1){const w=Math.max(1,Math.min(1024,Math.round(width))),h=Math.max(1,Math.min(1024,Math.round(height)));for(const layer of [base,pass,out]){if(layer.width!==w||layer.height!==h){layer.width=w;layer.height=h;}else layer.getContext('2d').clearRect(0,0,w,h);}base.getContext('2d').drawImage(source,0,0,source.width,source.height,0,0,w,h);const a=pass.getContext('2d'),b=out.getContext('2d');a.globalCompositeOperation=b.globalCompositeOperation='lighter';for(let group=0;group<groups;group++){const left=Math.round(group*w/groups),right=Math.round((group+1)*w/groups);a.save();a.beginPath();a.rect(left,0,right-left,h);a.clip();for(let k=-3;k<=3;k++){a.globalAlpha=SMOOTH_KERNEL[k+3]/64;a.drawImage(base,left,0,right-left,h,left+k,0,right-left,h);}a.restore();}b.globalAlpha=.25;b.drawImage(base,0,0);for(let k=-3;k<=3;k++){b.globalAlpha=.75*SMOOTH_KERNEL[k+3]/64;b.drawImage(pass,0,k);}context.drawImage(out,0,0,width,height);}};}

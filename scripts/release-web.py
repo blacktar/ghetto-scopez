@@ -23,7 +23,6 @@ if guide.exists():
  if guide_version.split('-r')[0]!=version:guide_version=version
  guide_version_file.write_text(guide_version+'\n')
  text=re.sub(r'Guide [0-9.]+(?:-r[0-9]+)? · ', '', text)
- text=text.replace('Viewer ',f'Guide {guide_version} · Viewer ',1)
  text=re.sub(r'Viewer \d+\.\d+\.\d+( · GTap [^<]+? · )\d{8}',lambda m:f'Viewer {version}'+m[1]+stamp,text)
  pattern=r'(<script type="application/ld\+json">\s*)(.*?)(\s*</script>)'
  match=re.search(pattern,text,re.S)
@@ -32,7 +31,7 @@ if guide.exists():
   for item in metadata.get('@graph',[]):
    if item.get('@id','').endswith('#software'):
     item['softwareVersion']=version
-    item['downloadUrl']=f'https://github.com/blacktar/ghetto-scopez/releases/download/v{version}/Ghetto-Scopez-{version}-mac.zip'
+    item['downloadUrl']=f'https://github.com/blacktar/ghetto-scopez/releases/download/v{version}/Ghetto-Scopez-{version}-mac.pkg'
    if item.get('@type')=='TechArticle':item['version']=guide_version
    if 'dateModified' in item:item['dateModified']=f'{stamp[:4]}-{stamp[4:6]}-{stamp[6:]}'
   text=text[:match.start(2)]+json.dumps(metadata,ensure_ascii=False,indent=2)+text[match.end(2):]

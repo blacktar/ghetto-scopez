@@ -2,6 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 archive="$(pwd)/build/GTap.ofx.bundle.zip"
+[[ -f "$archive" ]] || archive="$(pwd)/release/GTap-v1.2.26.ofx.bundle.zip"
 [[ -f "$archive" ]] || bash scripts/build-ofx.sh
 target="/Library/OFX/Plugins/SignalLabTap.ofx.bundle"
 if [[ -e "$target" ]]; then

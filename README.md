@@ -7,7 +7,7 @@ Made by **Vidar Andersen**. [Read the user guide](https://vidarandersen.com/dmz/
 
 ## Install and start
 
-This release includes **GTap 1.2.24** and **viewer 0.2.52**.
+This release includes **GTap 1.2.26** and **viewer 0.2.54**.
 The supplied universal GTap binary requires **macOS 27 or later** (Apple silicon
 or Intel). Earlier macOS versions have not been verified for this release.
 DaVinci Resolve is required. The new `.pkg` installer bundles the server,
@@ -54,3 +54,5 @@ their own licences; see [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
 
 See [DEVELOPING.md](DEVELOPING.md) for source builds and tests. Source archives
 without the prebuilt effect cannot run the release installer until GTap is built.
+
+Zoom (1×–4×) and Detail Level (Q1–Q4) are independent. Q controls underlying detail in all scope types; Smooth now applies to every plot using spatial, value-axis, circular-hue or soft-point filtering as appropriate. DoubleD always retains its aspect ratio. The expanded grids require GTap 1.2.25 and the updated host.

@@ -1,4 +1,4 @@
-// Frozen pre-optimisation JavaScript oracle for native differential tests. Not used by the live server.
+// Independent scalar JavaScript oracle (dimension configuration extended for global Q levels) for native differential tests. Not used by the live server.
 import {signalSpec,measurementDomain,coding,decodeYCbCr,decodeSample,encodeSample,chroma,calibratedTargets,MATRICES} from './public/signal.mjs';
 export const KINDS=['ramp','bars','bars75','sine','ramp10','ramp12','excursions','impulse','tonal-casts'];
 const BARS=[[1,1,1],[1,1,0],[0,1,1],[0,1,0],[1,0,1],[1,0,0],[0,0,1],[0,0,0]];
@@ -11,7 +11,7 @@ export function configuration(input={}){
  const model=input.model??'RGB',range=input.range??'full',matrix=input.matrix??'bt709',codeBits=Number(input.codeBits??10);signalSpec({model,range,matrix,codeBits});
  const lowCut=Number(input.lowCut??.25),highCut=Number(input.highCut??.75);if(!Number.isFinite(lowCut)||!Number.isFinite(highCut)||lowCut<0||highCut>1||lowCut>=highCut)throw Error('Tonal boundaries require 0 ≤ low < high ≤ 1');
  const roi={x0:Number(input.x0??0),x1:input.x1==null?null:Number(input.x1),y0:Number(input.y0??0),y1:input.y1==null?null:Number(input.y1)};for(const v of Object.values(roi))if(v!==null&&(!Number.isInteger(v)||v<0))throw Error('ROI bounds must be nonnegative integer pixels');
- return {...roi,lowCut,highCut,twinWidth:512,twinHeight:1024,twinZoom,twinX:1.25/twinZoom,twinY:2.5/twinZoom,model,range,matrix,codeBits,bits,levels:2**bits,histBins:2**bits,waveWidth:512,vectorSize:512*vectorDisplayScale,vectorDisplayScale,min,max,vectorZoom};
+ return {...roi,lowCut,highCut,twinWidth:512*vectorDisplayScale,twinHeight:1024*vectorDisplayScale,twinZoom,twinX:1.25/twinZoom,twinY:2.5/twinZoom,model,range,matrix,codeBits,bits,levels:2**bits,histBins:2**bits*vectorDisplayScale,waveWidth:512*vectorDisplayScale,vectorSize:512*vectorDisplayScale,vectorDisplayScale,min,max,vectorZoom};
 }
 export function makeFixture(kind='ramp',phase=0,height=64,signalInput={model:'RGB',range:'full',matrix:'bt709',codeBits:10}){
  const signal=signalSpec({...signalInput,primaries:MATRICES[signalInput.matrix].primaries,transfer:MATRICES[signalInput.matrix].transfer,measurementStage:'synthetic encoded test input',quantization:kind==='ramp10'?'1024 RGB steps':kind==='ramp12'?'4096 RGB steps':'unquantized float'});if(!KINDS.includes(kind))throw Error('Unknown fixture');const width=kind==='ramp10'?1024:kind==='ramp12'?4096:256,data=new Float32Array(width*height*3);

@@ -1,7 +1,7 @@
 import {encodeWaveColour,decodeWaveColour,WAVE_COLOUR_ENCODING} from './wave-colour-codec.mjs';
 import {signalSpec,coding} from './signal.mjs';
 import {crc32} from './protocol.mjs';
-export const FIELDS=['wave','parade','hist','vector','low','mid','high','twin','cube','waveColour','preview','satlum','hue'];const MAX_TOTAL=40000000;
+export const FIELDS=['wave','parade','hist','vector','low','mid','high','twin','cube','waveColour','preview','satlum','hue'];const MAX_TOTAL=100000000;
 const previousSparse=new WeakMap();
 // Optional active indices belong to an immutable analyzed frame; general callers retain a full validation scan.
 const varBytes=v=>v<128?1:v<16384?2:v<2097152?3:v<268435456?4:5;
@@ -27,3 +27,6 @@ export function unpackScope(buffer,reuse){if(buffer.byteLength<32)throw Error('S
  b=bytes[at++];if(b===undefined)throw Error('Truncated variable integer');if(b<128)return v|(b<<21);v|=(b&127)<<21;
  b=bytes[at++];if(b===undefined)throw Error('Truncated variable integer');if(b&240)throw Error('Variable integer overflow');return(v|(b<<28))>>>0;
 };for(let i=0;i<count;i++){if(mode){const ix=mode===2?prev+readVar():d.getUint32(at,true);if(ix>=n||ix<=prev)throw Error('Invalid sparse index');a[ix]=mode===2?readVar():d.getUint32(at+4,true);active[i]=ix;prev=ix;if(mode===1)at+=8;}else{a[i]=d.getUint32(at,true);at+=4;}}previousSparse.set(a,active);meta[p.name]=a;}if(at!==d.byteLength)throw Error('Trailing scope data');return {...meta,seq:d.getUint32(4,true),generation:d.getUint32(8,true),skipped:d.getUint32(12,true)};}
+
+// Read-only sparse indices retained by the decoder; null denotes a dense plane.
+export function activeScopeBins(plane){return previousSparse.get(plane)??null;}

@@ -56,7 +56,7 @@ if not a.resume:
    else:shutil.copy2(src,dst)
  shutil.copy2(root/'release/scope-analysis.node',host/'build/scope-analysis.node')
  plugin=payload/'Library/OFX/Plugins';plugin.mkdir(parents=True)
- run('ditto','-x','-k',root/'release/GTap-v1.2.24.ofx.bundle.zip',plugin)
+ run('ditto','-x','-k',root/'release/GTap-v1.2.26.ofx.bundle.zip',plugin)
  for name in ['LICENSE','LICENSE-NOTICE.txt','THIRD-PARTY-NOTICES.txt']:shutil.copy2(root/name,resources/name)
  info={'CFBundleIdentifier':'com.vidarandersen.ghettoscopez','CFBundleName':'Ghetto Scopez','CFBundleDisplayName':'Ghetto Scopez','CFBundleExecutable':'GhettoScopez','CFBundleIconFile':'AppIcon.icns','CFBundlePackageType':'APPL','CFBundleShortVersionString':version,'CFBundleVersion':version,'LSMinimumSystemVersion':'27.0','LSUIElement':True,'NSHighResolutionCapable':True,'NSHumanReadableCopyright':'© 2026 Vidar Andersen'}
  shutil.copy2(root/'installer/AppIcon.icns',resources/'AppIcon.icns')

@@ -1,0 +1,24 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {OGGame,OG_MAGNIFICATION,ogDisplaySettings,OG_ORDER,clock,strongestTarget,ogTargets} from './public/og-game.mjs';
+import {calibratedTargets} from './public/signal.mjs';
+import {scopeChoices,analysisScopes,validLayout} from './public/layout.mjs';
+function hit(g,label,time){g.feed(label,time);g.feed(label,time+1000);}
+function frame(points){const n=256,vector=new Uint32Array(n*n);for(const [label,count,offset=0]of points){const t=calibratedTargets('bt709').find(t=>t.label===label&&t.percent===75),x=Math.round((.5+(t.cb+offset)/OG_MAGNIFICATION)*(n-1)),y=Math.round((.5+t.cr/OG_MAGNIFICATION)*(n-1));vector[y*n+x]+=count;}return {vector,config:{vectorSize:n,vectorZoom:1,matrix:'bt709'},targets:calibratedTargets('bt709')};}
+test('holds must be continuous for 1s; wrong order restores diamonds without resetting clock',()=>{const events=[],g=new OGGame({event:e=>events.push(e)});g.feed('R',0);g.feed('R',999);assert.equal(g.started,null);g.feed(null,1000);hit(g,'R',2000);assert.equal(g.started,3000);assert.deepEqual(g.collected,['R']);hit(g,'R',4000);assert.deepEqual(g.collected,['R']);hit(g,'C',6000);assert.deepEqual(g.collected,[]);assert.equal(g.started,3000);assert.equal(g.elapsed(8000),5000);assert.equal(events.at(-1).type,'reset');});
+test('clockwise completion freezes elapsed and persists only a better score',()=>{const scores=[],g=new OGGame({best:100000,save:v=>scores.push(v)});OG_ORDER.forEach((label,i)=>hit(g,label,i*2000));assert.equal(g.finished,11000);assert.equal(g.elapsed(999999),10000);assert.deepEqual(scores,[10000]);g.feed('C',20000);assert.equal(g.collected.length,6);assert.equal(clock(3661000),'01:01:01');});
+test('end discards progress and blocks later input, preserving best time',()=>{const g=new OGGame({best:5000});hit(g,'R',0);g.end();hit(g,'M',2000);assert.deepEqual(g.collected,[]);assert.equal(g.best,5000);});
+test('exact vector mass judges strongest cluster and rejects stray pixels, ties and diffuse clusters',()=>{assert.equal(strongestTarget(frame([['R',1000],['C',100]])),'R');assert.equal(strongestTarget(frame([['R',1]])),null);assert.equal(strongestTarget(frame([['R',100],['C',100]])),null);assert.equal(strongestTarget(frame([['R',1000,.06],['R',10]])),null);});
+test('working-space uses fixed709 target geometry; clockwise screen order matches standard box positions',()=>{const data=frame([['R',1000]]);data.targets=[];data.source={signal:{domain:'working'}};assert.equal(strongestTarget(data),'R');const ts=ogTargets(data);const angles=ts.map(t=>Math.atan2(-t.cr,t.cb));for(let i=1;i<6;i++){const delta=(angles[i]-angles[i-1]+Math.PI*2)%(Math.PI*2);assert.ok(delta>0&&delta<Math.PI);}});
+test('only one OG is valid; option disappears elsewhere and maps to real vector analysis',()=>{assert.ok(validLayout([16,3,-1,7]));assert.equal(validLayout([16,16,-1,-1]),false);assert.equal(scopeChoices([16,3,-1,-1],3).some(v=>v.id===16),false);assert.ok(scopeChoices([16,3,-1,-1],16).some(v=>v.id===16));assert.ok(scopeChoices([-1,3,-1,-1]).some(v=>v.id===16));assert.deepEqual(analysisScopes([16,3,-1,-1]),[3]);});
+
+test('progress-loss warning is relevant only while the timer is running',()=>{const g=new OGGame();assert.equal(g.inProgress,false);g.feed('R',0);assert.equal(g.inProgress,false);g.feed('R',1000);assert.equal(g.inProgress,true);for(const [i,label] of ['M','B','C','G','Y'].entries()){g.feed(label,2000+i*2000);g.feed(label,3000+i*2000);}assert.equal(g.inProgress,false);assert.notEqual(g.finished,null);g.end();assert.equal(g.inProgress,false);});
+
+test('OG starts at2x and scores half-chroma signal at fixed target boxes',()=>{assert.equal(OG_MAGNIFICATION,2);for(const label of OG_ORDER)assert.equal(strongestTarget(frame([[label,1000]])),label);});
+
+test('broad real-footage tails permit a substantial target population but reject a stray tip',()=>{assert.equal(strongestTarget(frame([['R',947,.06],['R',53]])),'R');assert.equal(strongestTarget(frame([['R',997,.06],['R',3]])),null);});
+
+test('real magenta tail captures at3.5percent and collected colours cannot block remaining targets',()=>{assert.equal(strongestTarget(frame([['M',965,.06],['M',35]])),'M');assert.equal(strongestTarget(frame([['R',1000],['M',100]]),['R']),'M');assert.equal(strongestTarget(frame([['R',1000]]),['R']),null);});
+
+test('OG hit detection follows selected zoom independently of detail grid',()=>{for(const zoom of [1,2,3,4]){const d=frame([['B',1000]]);assert.equal(strongestTarget(d,[],zoom),zoom===2?'B':null);}});
+
+test('OG virgin display defaults2x/Q4, valid last-used settings survive and invalid values fall back',()=>{assert.deepEqual(ogDisplaySettings(),{zoom:2,detail:4});assert.deepEqual(ogDisplaySettings({zoom:4,detail:2}),{zoom:4,detail:2});assert.deepEqual(ogDisplaySettings({zoom:0,detail:9}),{zoom:2,detail:4});});
